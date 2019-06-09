@@ -38,3 +38,15 @@ public extension Publishers {
         }
     }
 }
+
+public extension Publishers.Just {
+    func map<T>(_ transform: (Output) -> T) -> Publishers.Just<T> {
+        return Publishers.Just<T>(transform(output))
+    }
+}
+
+extension Publishers.Just: Equatable where Output: Equatable {
+    public static func == (lhs: Publishers.Just<Output>, rhs: Publishers.Just<Output>) -> Bool {
+        return lhs.output == rhs.output
+    }
+}

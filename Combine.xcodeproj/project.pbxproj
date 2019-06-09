@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC2EB4D822A94E48009A0E54 /* MapError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4D722A94E48009A0E54 /* MapError.swift */; };
+		BC2EB4DB22A9539B009A0E54 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */; };
+		BC2EB4DD22AD48A1009A0E54 /* Scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DC22AD48A1009A0E54 /* Scan.swift */; };
 		BCD4D72B22A7590A00DE874F /* Combine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCD4D72122A7590A00DE874F /* Combine.framework */; };
 		BCD4D73022A7590A00DE874F /* CombineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D72F22A7590A00DE874F /* CombineTests.swift */; };
 		BCD4D73222A7590A00DE874F /* Combine.h in Headers */ = {isa = PBXBuildFile; fileRef = BCD4D72422A7590A00DE874F /* Combine.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -33,6 +36,19 @@
 		BCD4D76D22A7A35E00DE874F /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76C22A7A35E00DE874F /* Connection.swift */; };
 		BCD4D76F22A7A57700DE874F /* UpstreamConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */; };
 		BCD4D77122A7B7D200DE874F /* ForwardConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D77022A7B7D200DE874F /* ForwardConnection.swift */; };
+		BCEAFBBA22A8F7B900ABF36B /* FlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB622A8F7B900ABF36B /* FlatMap.swift */; };
+		BCEAFBBB22A8F7B900ABF36B /* TryMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB722A8F7B900ABF36B /* TryMap.swift */; };
+		BCEAFBBC22A8F7B900ABF36B /* ReceiveOn.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB822A8F7B900ABF36B /* ReceiveOn.swift */; };
+		BCEAFBBD22A8F7B900ABF36B /* SubscribeOn.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB922A8F7B900ABF36B /* SubscribeOn.swift */; };
+		BCEAFBBF22A8F7EA00ABF36B /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBBE22A8F7EA00ABF36B /* Scheduler.swift */; };
+		BCED60CA22A8B25500CE5277 /* PassthroughSubject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60C922A8B25500CE5277 /* PassthroughSubject.swift */; };
+		BCED60CC22A8B4AF00CE5277 /* CurrentValueSubject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60CB22A8B4AF00CE5277 /* CurrentValueSubject.swift */; };
+		BCED60CE22A8B6B300CE5277 /* AnySubject.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60CD22A8B6B300CE5277 /* AnySubject.swift */; };
+		BCED60D022A8B80000CE5277 /* ConnectablePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60CF22A8B80000CE5277 /* ConnectablePublisher.swift */; };
+		BCED60D222A8B83900CE5277 /* Autoconnect.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60D122A8B83900CE5277 /* Autoconnect.swift */; };
+		BCED60D422A8BD5C00CE5277 /* AllSatisfy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60D322A8BD5C00CE5277 /* AllSatisfy.swift */; };
+		BCED60D622A8C07800CE5277 /* Collect.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60D522A8C07800CE5277 /* Collect.swift */; };
+		BCED60D822A8C1EE00CE5277 /* CollectByCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCED60D722A8C1EE00CE5277 /* CollectByCount.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +62,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BC2EB4D722A94E48009A0E54 /* MapError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapError.swift; sourceTree = "<group>"; };
+		BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscriptions.swift; sourceTree = "<group>"; };
+		BC2EB4DC22AD48A1009A0E54 /* Scan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scan.swift; sourceTree = "<group>"; };
 		BCD4D72122A7590A00DE874F /* Combine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Combine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD4D72422A7590A00DE874F /* Combine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Combine.h; sourceTree = "<group>"; };
 		BCD4D72522A7590A00DE874F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -75,6 +94,19 @@
 		BCD4D76C22A7A35E00DE874F /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpstreamConnection.swift; sourceTree = "<group>"; };
 		BCD4D77022A7B7D200DE874F /* ForwardConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardConnection.swift; sourceTree = "<group>"; };
+		BCEAFBB622A8F7B900ABF36B /* FlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlatMap.swift; sourceTree = "<group>"; };
+		BCEAFBB722A8F7B900ABF36B /* TryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryMap.swift; sourceTree = "<group>"; };
+		BCEAFBB822A8F7B900ABF36B /* ReceiveOn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveOn.swift; sourceTree = "<group>"; };
+		BCEAFBB922A8F7B900ABF36B /* SubscribeOn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscribeOn.swift; sourceTree = "<group>"; };
+		BCEAFBBE22A8F7EA00ABF36B /* Scheduler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
+		BCED60C922A8B25500CE5277 /* PassthroughSubject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassthroughSubject.swift; sourceTree = "<group>"; };
+		BCED60CB22A8B4AF00CE5277 /* CurrentValueSubject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentValueSubject.swift; sourceTree = "<group>"; };
+		BCED60CD22A8B6B300CE5277 /* AnySubject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySubject.swift; sourceTree = "<group>"; };
+		BCED60CF22A8B80000CE5277 /* ConnectablePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectablePublisher.swift; sourceTree = "<group>"; };
+		BCED60D122A8B83900CE5277 /* Autoconnect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Autoconnect.swift; sourceTree = "<group>"; };
+		BCED60D322A8BD5C00CE5277 /* AllSatisfy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllSatisfy.swift; sourceTree = "<group>"; };
+		BCED60D522A8C07800CE5277 /* Collect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collect.swift; sourceTree = "<group>"; };
+		BCED60D722A8C1EE00CE5277 /* CollectByCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectByCount.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +128,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BC2EB4D922A95386009A0E54 /* Subscription */ = {
+			isa = PBXGroup;
+			children = (
+				BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */,
+			);
+			path = Subscription;
+			sourceTree = "<group>";
+		};
 		BCD4D71722A7590A00DE874F = {
 			isa = PBXGroup;
 			children = (
@@ -120,20 +160,19 @@
 				BCD4D72422A7590A00DE874F /* Combine.h */,
 				BCD4D72522A7590A00DE874F /* Info.plist */,
 				BCD4D74122A75A1300DE874F /* AnyCancellable.swift */,
-				BCD4D73F22A759B300DE874F /* AnyPublisher.swift */,
-				BCD4D74522A75A7000DE874F /* AnySubscriber.swift */,
 				BCD4D75422A761FB00DE874F /* Cancellable.swift */,
 				BCD4D75F22A7708E00DE874F /* CombineIdentifier.swift */,
 				BCD4D75D22A7707700DE874F /* CustomCombineIdentifierConvertible.swift */,
 				BCD4D73B22A7591C00DE874F /* Publisher.swift */,
-				BCD4D74922A75C0500DE874F /* Publishers.swift */,
+				BCEAFBBE22A8F7EA00ABF36B /* Scheduler.swift */,
 				BCD4D74722A75B4600DE874F /* Subject.swift */,
 				BCD4D73D22A7592500DE874F /* Subscriber.swift */,
-				BCD4D74322A75A4E00DE874F /* Subscribers.swift */,
 				BCD4D75B22A76FF300DE874F /* Subscription.swift */,
 				BCD4D76B22A7A22D00DE874F /* Internal */,
 				BCD4D74B22A75D0300DE874F /* Publishers */,
+				BCED60C822A8B24600CE5277 /* Subjects */,
 				BCD4D75822A7661800DE874F /* Subscribers */,
+				BC2EB4D922A95386009A0E54 /* Subscription */,
 			);
 			path = Combine;
 			sourceTree = "<group>";
@@ -150,11 +189,24 @@
 		BCD4D74B22A75D0300DE874F /* Publishers */ = {
 			isa = PBXGroup;
 			children = (
+				BCED60D322A8BD5C00CE5277 /* AllSatisfy.swift */,
+				BCD4D73F22A759B300DE874F /* AnyPublisher.swift */,
+				BCED60D122A8B83900CE5277 /* Autoconnect.swift */,
+				BCED60D522A8C07800CE5277 /* Collect.swift */,
+				BCED60D722A8C1EE00CE5277 /* CollectByCount.swift */,
 				BCD4D75022A75EF200DE874F /* Concatenate.swift */,
+				BCED60CF22A8B80000CE5277 /* ConnectablePublisher.swift */,
 				BCD4D74C22A75D2900DE874F /* Empty.swift */,
+				BCEAFBB622A8F7B900ABF36B /* FlatMap.swift */,
 				BCD4D76622A793C700DE874F /* Just.swift */,
 				BCD4D75222A7608A00DE874F /* Map.swift */,
+				BC2EB4D722A94E48009A0E54 /* MapError.swift */,
+				BCD4D74922A75C0500DE874F /* Publishers.swift */,
+				BCEAFBB822A8F7B900ABF36B /* ReceiveOn.swift */,
+				BC2EB4DC22AD48A1009A0E54 /* Scan.swift */,
 				BCD4D74E22A75E1B00DE874F /* Sequence.swift */,
+				BCEAFBB922A8F7B900ABF36B /* SubscribeOn.swift */,
+				BCEAFBB722A8F7B900ABF36B /* TryMap.swift */,
 			);
 			path = Publishers;
 			sourceTree = "<group>";
@@ -162,9 +214,11 @@
 		BCD4D75822A7661800DE874F /* Subscribers */ = {
 			isa = PBXGroup;
 			children = (
+				BCD4D74522A75A7000DE874F /* AnySubscriber.swift */,
 				BCD4D76122A7726A00DE874F /* Completion.swift */,
 				BCD4D75922A7662300DE874F /* Demand.swift */,
 				BCD4D76322A772F900DE874F /* Sink.swift */,
+				BCD4D74322A75A4E00DE874F /* Subscribers.swift */,
 			);
 			path = Subscribers;
 			sourceTree = "<group>";
@@ -177,6 +231,16 @@
 				BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */,
 			);
 			path = Internal;
+			sourceTree = "<group>";
+		};
+		BCED60C822A8B24600CE5277 /* Subjects */ = {
+			isa = PBXGroup;
+			children = (
+				BCED60CD22A8B6B300CE5277 /* AnySubject.swift */,
+				BCED60CB22A8B4AF00CE5277 /* CurrentValueSubject.swift */,
+				BCED60C922A8B25500CE5277 /* PassthroughSubject.swift */,
+			);
+			path = Subjects;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -254,6 +318,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = BCD4D71722A7590A00DE874F;
 			productRefGroup = BCD4D72222A7590A00DE874F /* Products */;
@@ -288,22 +353,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCEAFBBD22A8F7B900ABF36B /* SubscribeOn.swift in Sources */,
 				BCD4D74422A75A4E00DE874F /* Subscribers.swift in Sources */,
 				BCD4D75522A761FB00DE874F /* Cancellable.swift in Sources */,
 				BCD4D75A22A7662300DE874F /* Demand.swift in Sources */,
+				BCED60CA22A8B25500CE5277 /* PassthroughSubject.swift in Sources */,
 				BCD4D76722A793C700DE874F /* Just.swift in Sources */,
 				BCD4D73C22A7591C00DE874F /* Publisher.swift in Sources */,
 				BCD4D74822A75B4600DE874F /* Subject.swift in Sources */,
+				BC2EB4DB22A9539B009A0E54 /* Subscriptions.swift in Sources */,
 				BCD4D75122A75EF200DE874F /* Concatenate.swift in Sources */,
+				BCEAFBBF22A8F7EA00ABF36B /* Scheduler.swift in Sources */,
+				BC2EB4D822A94E48009A0E54 /* MapError.swift in Sources */,
+				BCEAFBBC22A8F7B900ABF36B /* ReceiveOn.swift in Sources */,
+				BCED60D022A8B80000CE5277 /* ConnectablePublisher.swift in Sources */,
 				BCD4D74222A75A1300DE874F /* AnyCancellable.swift in Sources */,
 				BCD4D74A22A75C0500DE874F /* Publishers.swift in Sources */,
 				BCD4D76422A772F900DE874F /* Sink.swift in Sources */,
+				BCED60CE22A8B6B300CE5277 /* AnySubject.swift in Sources */,
+				BCEAFBBA22A8F7B900ABF36B /* FlatMap.swift in Sources */,
 				BCD4D74D22A75D2900DE874F /* Empty.swift in Sources */,
+				BCED60D822A8C1EE00CE5277 /* CollectByCount.swift in Sources */,
 				BCD4D76D22A7A35E00DE874F /* Connection.swift in Sources */,
+				BCEAFBBB22A8F7B900ABF36B /* TryMap.swift in Sources */,
+				BCED60D222A8B83900CE5277 /* Autoconnect.swift in Sources */,
+				BCED60D622A8C07800CE5277 /* Collect.swift in Sources */,
 				BCD4D75C22A76FF300DE874F /* Subscription.swift in Sources */,
 				BCD4D74022A759B300DE874F /* AnyPublisher.swift in Sources */,
+				BCED60D422A8BD5C00CE5277 /* AllSatisfy.swift in Sources */,
 				BCD4D75E22A7707700DE874F /* CustomCombineIdentifierConvertible.swift in Sources */,
+				BC2EB4DD22AD48A1009A0E54 /* Scan.swift in Sources */,
 				BCD4D74622A75A7000DE874F /* AnySubscriber.swift in Sources */,
+				BCED60CC22A8B4AF00CE5277 /* CurrentValueSubject.swift in Sources */,
 				BCD4D74F22A75E1B00DE874F /* Sequence.swift in Sources */,
 				BCD4D75322A7608A00DE874F /* Map.swift in Sources */,
 				BCD4D76222A7726A00DE874F /* Completion.swift in Sources */,

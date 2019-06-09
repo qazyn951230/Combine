@@ -6,43 +6,42 @@
 //  Copyright © 2019 Nan Yang. All rights reserved.
 //
 
-class ForwardConnection<Upstream, Downstream>: Connection<Downstream>, Subscriber where Upstream: Publisher,
-    Downstream: Subscriber, Upstream.Failure == Downstream.Failure {
-    typealias Input = Upstream.Output
-    typealias Failure = Upstream.Failure
+class ForwardConnection<Downstream>: Connection<Downstream>, Subscriber where Downstream: Subscriber {
+    typealias Input = Downstream.Input
+    typealias Failure = Downstream.Failure
 
-    let upstream: Upstream
-
-    init(_ upstream: Upstream, _ downstream: Downstream) {
-        self.upstream = upstream
-        super.init(downstream)
-    }
-
+    var upstream: Subscription?
+    
     func receive(_ input: Input) -> Subscribers.Demand {
-        return Subscribers.Demand.none
+        return forward(input)
     }
-
+    
     func receive(subscription: Subscription) {
         if stop {
             subscription.cancel()
             return
         }
+        assert(upstream == nil)
+        upstream = subscription
         downstream.receive(subscription: self)
-        upstream.receive(subscriber: self)
     }
-
+    
     func receive(completion: Subscribers.Completion<Failure>) {
         forward(completion: completion)
     }
-
+    
     override func request(_ demand: Subscribers.Demand) {
         if stop {
             return
         }
-        upstream.receive(subscriber: self)
+        assert(upstream != nil)
+        upstream?.request(demand)
     }
-
+    
     override func cancel() {
         super.cancel()
+        let up = upstream
+        upstream = nil
+        up?.cancel()
     }
 }

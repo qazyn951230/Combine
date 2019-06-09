@@ -6,7 +6,7 @@
 //  Copyright © 2019 Nan Yang. All rights reserved.
 //
 
-final public class AnyCancellable: Cancellable {
+public final class AnyCancellable: Cancellable {
     private var _cancel: (() -> Void)?
 
     public init(_ cancel: @escaping () -> Void) {

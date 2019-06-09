@@ -28,6 +28,11 @@ public extension Publishers {
 
         public let transform: (Upstream.Output) -> Output
         public let upstream: Upstream
+        
+        init(upstream: Upstream, transform: @escaping (Upstream.Output) -> Output) {
+            self.transform = transform
+            self.upstream = upstream
+        }
 
         public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
             let connection = MapConnection(transform, subscriber)

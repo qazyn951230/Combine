@@ -14,9 +14,8 @@ class Connection<Downstream>: Subscription where Downstream: Subscriber {
         self.downstream = downstream
     }
 
-    // 要求 Connection 传递 Demand 个 Downstream.Input
     func request(_ demand: Subscribers.Demand) {
-        forward(completion: Subscribers.Completion.finished)
+        // Do nothing.
     }
 
     func forward(_ input: Downstream.Input) -> Subscribers.Demand {

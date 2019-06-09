@@ -7,10 +7,15 @@
 //
 
 public protocol Subscriber: CustomCombineIdentifierConvertible {
+    /// The kind of values this subscriber receives.
     associatedtype Input
+    /// The kind of errors this subscriber might receive.
+    ///
+    /// Use `Never` if this `Subscriber` cannot receive errors.
     associatedtype Failure: Error
 
     // MARK: - Receiving Elements
+
     /// Tells the subscriber that the publisher has produced an element.
     /// - Parameters:
     ///   - input: The published element.
@@ -19,6 +24,7 @@ public protocol Subscriber: CustomCombineIdentifierConvertible {
     func receive(_ input: Input) -> Subscribers.Demand
 
     // MARK: - Receiving Life Cycle Events
+
     /// Tells the subscriber that it has successfully subscribed to the publisher and may request items.
     func receive(subscription: Subscription)
 
