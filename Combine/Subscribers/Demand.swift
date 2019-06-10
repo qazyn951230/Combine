@@ -1,10 +1,24 @@
+// MIT License
 //
-//  Demand.swift
-//  Combine
+// Copyright (c) 2017-present qazyn951230 qazyn951230@gmail.com
 //
-//  Created by Nan Yang on 2019/6/5.
-//  Copyright © 2019 Nan Yang. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
 public extension Subscribers {
     /// A requested number of items, sent to a publisher from a subscriber via the subscription.
@@ -53,13 +67,13 @@ public extension Subscribers {
         }
 
         // MAKR: Comparing Demands
-        public static func == (lhs: Demand, rhs: Demand) -> Bool {
+        public static func ==(lhs: Demand, rhs: Demand) -> Bool {
             return lhs.max == rhs.max
         }
 
         /// If rhs is `.unlimited`, then the result is always false. If lhs is `.unlimited`
         ///   then the result is always false. Otherwise, the two max values are compared.
-        public static func > (lhs: Demand, rhs: Demand) -> Bool {
+        public static func >(lhs: Demand, rhs: Demand) -> Bool {
             switch (lhs, rhs) {
             case let (.max(left), .max(right)):
                 return left > right
@@ -70,7 +84,7 @@ public extension Subscribers {
 
         /// If lhs is `.unlimited`, then the result is always false. If rhs is `.unlimited`
         ///   then the result is always false. Otherwise, the two max values are compared.
-        public static func < (lhs: Demand, rhs: Demand) -> Bool {
+        public static func <(lhs: Demand, rhs: Demand) -> Bool {
             switch (lhs, rhs) {
             case let (.max(left), .max(right)):
                 return left < right
@@ -81,7 +95,7 @@ public extension Subscribers {
 
         /// If `lhs` is `.unlimited` and `rhs` is `.unlimited` then the result is true.
         ///   Otherwise, the rules for `>` are followed.
-        public static func >= (lhs: Demand, rhs: Demand) -> Bool {
+        public static func >=(lhs: Demand, rhs: Demand) -> Bool {
             switch (lhs, rhs) {
             case (.unlimited, .unlimited):
                 return true
@@ -92,7 +106,7 @@ public extension Subscribers {
 
         /// If `lhs` is `.unlimited` and `rhs` is `.unlimited` then the result is true.
         ///   Otherwise, the rules for `<` are followed.
-        public static func <= (lhs: Demand, rhs: Demand) -> Bool {
+        public static func <=(lhs: Demand, rhs: Demand) -> Bool {
             switch (lhs, rhs) {
             case (.unlimited, .unlimited):
                 return true
@@ -102,26 +116,26 @@ public extension Subscribers {
         }
 
         ///  Returns `true` if `lhs` and `rhs` are not equal. `.unlimited` is not equal to any integer.
-        public static func != (lhs: Demand, rhs: Int) -> Bool {
+        public static func !=(lhs: Demand, rhs: Int) -> Bool {
             return lhs.max != rhs
         }
 
         // Returns `true` if `lhs` and `rhs` are not equal. `.unlimited` is not equal to any integer.
-        public static func != (lhs: Int, rhs: Demand) -> Bool {
+        public static func !=(lhs: Int, rhs: Demand) -> Bool {
             return lhs != rhs.max
         }
 
         /// Returns `true` if `lhs` and `rhs` are equal. `.unlimited` is not equal to any integer.
-        public static func == (lhs: Demand, rhs: Int) -> Bool {
+        public static func ==(lhs: Demand, rhs: Int) -> Bool {
             return lhs.max == rhs
         }
 
         /// Returns `true` if `lhs` and `rhs` are equal. `.unlimited` is not equal to any integer.
-        public static func == (lhs: Int, rhs: Demand) -> Bool {
+        public static func ==(lhs: Int, rhs: Demand) -> Bool {
             return lhs == rhs.max
         }
 
-        public static func > (lhs: Demand, rhs: Int) -> Bool {
+        public static func >(lhs: Demand, rhs: Int) -> Bool {
             if let left = lhs.max {
                 return left > rhs
             }
@@ -129,7 +143,7 @@ public extension Subscribers {
             return true
         }
 
-        public static func > (lhs: Int, rhs: Demand) -> Bool {
+        public static func >(lhs: Int, rhs: Demand) -> Bool {
             if let right = rhs.max {
                 return lhs > right
             }
@@ -137,7 +151,7 @@ public extension Subscribers {
             return false
         }
 
-        public static func < (lhs: Demand, rhs: Int) -> Bool {
+        public static func <(lhs: Demand, rhs: Int) -> Bool {
             if let left = lhs.max {
                 return left < rhs
             }
@@ -145,7 +159,7 @@ public extension Subscribers {
             return false
         }
 
-        public static func < (lhs: Int, rhs: Demand) -> Bool {
+        public static func <(lhs: Int, rhs: Demand) -> Bool {
             if let right = rhs.max {
                 return lhs < right
             }
@@ -153,7 +167,7 @@ public extension Subscribers {
             return true
         }
 
-        public static func >= (lhs: Demand, rhs: Int) -> Bool {
+        public static func >=(lhs: Demand, rhs: Int) -> Bool {
             if let left = lhs.max {
                 return left >= rhs
             }
@@ -161,7 +175,7 @@ public extension Subscribers {
             return true
         }
 
-        public static func >= (lhs: Int, rhs: Demand) -> Bool {
+        public static func >=(lhs: Int, rhs: Demand) -> Bool {
             if let right = rhs.max {
                 return lhs >= right
             }
@@ -169,7 +183,7 @@ public extension Subscribers {
             return false
         }
 
-        public static func <= (lhs: Demand, rhs: Int) -> Bool {
+        public static func <=(lhs: Demand, rhs: Int) -> Bool {
             if let left = lhs.max {
                 return left <= rhs
             }
@@ -177,15 +191,15 @@ public extension Subscribers {
             return false
         }
 
-        public static func <= (lhs: Int, rhs: Demand) -> Bool {
+        public static func <=(lhs: Int, rhs: Demand) -> Bool {
             if let right = rhs.max {
                 return lhs <= right
             }
             // rhs is `.unlimited`
             return true
         }
-        
-        public static func + (lhs: Demand, rhs: Int) -> Demand {
+
+        public static func +(lhs: Demand, rhs: Int) -> Demand {
             switch lhs {
             case let .max(value):
                 let (next, overflow) = value.addingReportingOverflow(rhs)
@@ -197,8 +211,8 @@ public extension Subscribers {
                 return Demand.unlimited
             }
         }
-    
-        public static func - (lhs: Demand, rhs: Int) -> Demand {
+
+        public static func -(lhs: Demand, rhs: Int) -> Demand {
             switch lhs {
             case let .max(value):
                 let (next, overflow) = value.multipliedReportingOverflow(by: rhs)
@@ -210,8 +224,8 @@ public extension Subscribers {
                 return Demand.unlimited
             }
         }
-        
-        public static func * (lhs: Demand, rhs: Int) -> Demand {
+
+        public static func *(lhs: Demand, rhs: Int) -> Demand {
             switch lhs {
             case let .max(value):
                 let (next, overflow) = value.multipliedReportingOverflow(by: rhs)
@@ -223,8 +237,8 @@ public extension Subscribers {
                 return Demand.unlimited
             }
         }
-        
-        public static func / (lhs: Demand, rhs: Int) -> Demand {
+
+        public static func /(lhs: Demand, rhs: Int) -> Demand {
             switch lhs {
             case let .max(value):
                 let (next, overflow) = value.dividedReportingOverflow(by: rhs)
@@ -236,7 +250,7 @@ public extension Subscribers {
                 return Demand.unlimited
             }
         }
-        
+
         @inline(__always)
         static func reportNegative(_ value: Int) -> Demand {
             assert(value >= 0)

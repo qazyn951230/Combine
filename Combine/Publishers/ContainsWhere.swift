@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
+private final class ContainsWherePipe<Input, Downstream>: UpstreamPipe
     where Downstream: Subscriber, Downstream.Input == Bool {
     typealias Failure = Downstream.Failure
 
@@ -28,7 +28,7 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
     let downstream: Downstream
     var upstream: Subscription?
     let predicate: (Input) -> Bool
-    var result: Bool = true
+    var contains = false
 
     init(_ downstream: Downstream, _ predicate: @escaping (Input) -> Bool) {
         self.downstream = downstream
@@ -39,36 +39,45 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         if stop {
             return Subscribers.Demand.none
         }
-        result = result && predicate(input)
+        if !contains && predicate(input) {
+            contains = true
+            return forward(true)
+        }
         return Subscribers.Demand.unlimited
     }
 
-    func receive(completion: Subscribers.Completion<Failure>) {
+    func receive(completion: Subscribers.Completion<Downstream.Failure>) {
         switch completion {
-        case let .failure(e):
-            forward(failure: e)
+        case .failure:
+            forward(completion: completion)
         case .finished:
-            _ = forward(result)
+            if !contains {
+                forward(false)
+            }
             forwardFinished()
         }
     }
 }
 
 public extension Publishers {
-    struct AllSatisfy<Upstream>: Publisher where Upstream: Publisher {
+    /// A publisher that emits a Boolean value upon receiving an element that satisfies the predicate closure.
+    struct ContainsWhere<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = Bool
         public typealias Failure = Upstream.Failure
 
-        public let predicate: (Upstream.Output) -> Bool
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
+
+        /// The closure that determines whether the publisher should consider an element as a match.
+        public let predicate: (Upstream.Output) -> Bool
 
         init(upstream: Upstream, predicate: @escaping (Upstream.Output) -> Bool) {
             self.upstream = upstream
             self.predicate = predicate
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = AllSatisfyPipe(subscriber, predicate)
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure, S.Input == Output {
+            let pipe = ContainsWherePipe(subscriber, predicate)
             upstream.subscribe(pipe)
         }
     }

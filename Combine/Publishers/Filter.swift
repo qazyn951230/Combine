@@ -20,40 +20,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+private final class FilterPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
+    let isIncluded: (Input) -> Bool
 
-    init(_ downstream: Downstream) {
+    init(_ downstream: Downstream, _ isIncluded: @escaping (Input) -> Bool) {
         self.downstream = downstream
+        self.isIncluded = isIncluded
+    }
+
+    func receive(_ input: Input) -> Subscribers.Demand {
+        if stop {
+            return Subscribers.Demand.none
+        }
+        if isIncluded(input) {
+            return forward(input)
+        }
+        return Subscribers.Demand.unlimited
     }
 }
 
 public extension Publishers {
-    /// A publisher that delivers elements to its downstream subscriber on a specific scheduler.
-    struct SubscribeOn<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
+    /// A publisher that republishes all elements that match a provided closure.
+    struct Filter<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
 
-        public let options: Context.SchedulerOptions?
-        public let scheduler: Context
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        init(upstream: Upstream, scheduler: Context, options: Context.SchedulerOptions?) {
-            self.options = options
-            self.scheduler = scheduler
+        /// A closure that indicates whether to republish an element.
+        public let isIncluded: (Upstream.Output) -> Bool
+
+        init(upstream: Upstream, isIncluded: @escaping (Upstream.Output) -> Bool) {
             self.upstream = upstream
+            self.isIncluded = isIncluded
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = SubscribeOnOnPipe(subscriber)
-            scheduler.schedule(options: options) {
-                subscriber.receive(subscription: pipe)
-            }
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
+            Upstream.Output == S.Input {
+            let pipe = FilterPipe(subscriber, isIncluded)
+            upstream.subscribe(pipe)
         }
     }
 }

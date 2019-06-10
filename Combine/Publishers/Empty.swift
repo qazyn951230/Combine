@@ -1,19 +1,43 @@
+// MIT License
 //
-//  Empty.swift
-//  Combine
+// Copyright (c) 2017-present qazyn951230 qazyn951230@gmail.com
 //
-//  Created by Nan Yang on 2019/6/5.
-//  Copyright © 2019 Nan Yang. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-private final class EmptyConnection<Downstream>: Connection<Downstream> where Downstream: Subscriber {
-    override func request(_ demand: Subscribers.Demand) {
-        forward(completion: Subscribers.Completion.finished)
+private final class EmptyPipe<Downstream>: Pipe where Downstream: Subscriber {
+    typealias Input = Downstream.Input
+    typealias Failure = Downstream.Failure
+
+    var stop = false
+    let downstream: Downstream
+
+    init(_ downstream: Downstream) {
+        self.downstream = downstream
+    }
+
+    func request(_ demand: Subscribers.Demand) {
+        forwardFinished()
     }
 }
 
 public extension Publishers {
-    struct Empty<Output, Failure>: Publisher where Failure : Error {
+    struct Empty<Output, Failure>: Publisher where Failure: Error {
         public let completeImmediately: Bool
 
         public init(completeImmediately: Bool = true) {
@@ -24,12 +48,12 @@ public extension Publishers {
             self.completeImmediately = completeImmediately
         }
 
-        public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
             if completeImmediately {
-                subscriber.receive(completion: Subscribers.Completion.finished)
+                subscriber.receiveFinished()
             } else {
-                let connection = EmptyConnection(subscriber)
-                subscriber.receive(subscription: connection)
+                let pipe = EmptyPipe(subscriber)
+                subscriber.receive(subscription: pipe)
             }
         }
     }

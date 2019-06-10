@@ -20,27 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
-    where Downstream: Subscriber, Downstream.Input == Bool {
-    typealias Failure = Downstream.Failure
-
+private final class TryCompactMapPipe<Input, Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Failure: Error, Downstream.Failure == Error {
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let predicate: (Input) -> Bool
-    var result: Bool = true
+    let transform: (Input) throws -> Downstream.Input?
 
-    init(_ downstream: Downstream, _ predicate: @escaping (Input) -> Bool) {
+    init(_ downstream: Downstream, _ transform: @escaping (Input) throws -> Downstream.Input?) {
         self.downstream = downstream
-        self.predicate = predicate
+        self.transform = transform
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
-        result = result && predicate(input)
-        return Subscribers.Demand.unlimited
+        do {
+            if let next = try transform(input) {
+                return forward(next)
+            }
+        } catch let failure {
+            forward(failure: failure)
+        }
+        return Subscribers.Demand.none
     }
 
     func receive(completion: Subscribers.Completion<Failure>) {
@@ -48,27 +51,31 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         case let .failure(e):
             forward(failure: e)
         case .finished:
-            _ = forward(result)
             forwardFinished()
         }
     }
 }
 
 public extension Publishers {
-    struct AllSatisfy<Upstream>: Publisher where Upstream: Publisher {
-        public typealias Output = Bool
-        public typealias Failure = Upstream.Failure
+    /// A publisher that republishes all non-`nil` results of calling an error-throwing closure with each received element.
+    struct TryCompactMap<Upstream, Output>: Publisher where Upstream: Publisher {
+        public typealias Failure = Error
 
-        public let predicate: (Upstream.Output) -> Bool
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        init(upstream: Upstream, predicate: @escaping (Upstream.Output) -> Bool) {
+        /// an error-throwing closure that receives values from the upstream publisher and returns optional values.
+        ///
+        /// If this closure throws an error, the publisher fails.
+        public let transform: (Upstream.Output) throws -> Output?
+
+        init(upstream: Upstream, transform: @escaping (Upstream.Output) throws -> Output?) {
             self.upstream = upstream
-            self.predicate = predicate
+            self.transform = transform
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = AllSatisfyPipe(subscriber, predicate)
+        public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, S.Failure == Failure {
+            let pipe = TryCompactMapPipe<Upstream.Output, Upstream.Failure, S>(subscriber, transform)
             upstream.subscribe(pipe)
         }
     }

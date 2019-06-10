@@ -1,45 +1,49 @@
+// MIT License
 //
-//  CollectByCount.swift
-//  Combine
+// Copyright (c) 2017-present qazyn951230 qazyn951230@gmail.com
 //
-//  Created by Nan Yang on 2019/6/6.
-//  Copyright © 2019 Nan Yang. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-private final class CollectByCountConnection<Input, Downstream>: UpstreamConnection<Input, Downstream>
-where Downstream: Subscriber, Downstream.Input == [Input] {
+private final class CollectByCountPipe<Input, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Downstream.Input == [Input] {
+    typealias Failure = Downstream.Failure
+
+    var stop = false
+    let downstream: Downstream
+    var upstream: Subscription?
     var result: [Input] = []
     let count: Int
 
-    init(_ count: Int, _ downstream: Downstream) {
+    init(_ downstream: Downstream, _ count: Int) {
+        self.downstream = downstream
         self.count = count
         result.reserveCapacity(count)
-        super.init(downstream)
     }
 
-    override func request(_ demand: Subscribers.Demand) {
+    func request(_ demand: Subscribers.Demand) {
         if stop {
             return
         }
-        assert(upstream != nil)
-        guard let stream = upstream else {
-            return
-        }
-        switch demand {
-        case let .max(value):
-            // https://developer.apple.com/documentation/combine/publisher/3204693-collect
-            let (max, overflow) = value.multipliedReportingOverflow(by: count)
-            if overflow {
-                stream.request(Subscribers.Demand.unlimited)
-            } else {
-                stream.request(Subscribers.Demand.max(max))
-            }
-        case .unlimited:
-            stream.request(Subscribers.Demand.unlimited)
-        }
+        upstream?.request(demand * count)
     }
 
-    override func receive(_ input: Input) -> Subscribers.Demand {
+    func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
@@ -50,10 +54,10 @@ where Downstream: Subscriber, Downstream.Input == [Input] {
             result.removeAll(keepingCapacity: true)
             _ = forward(temp)
         }
-        return max > 0 ? Subscribers.Demand.max(max) : Subscribers.Demand.max(count)
+        return Subscribers.Demand.max(max > 0 ? max: count)
     }
 
-    override func receive(completion: Subscribers.Completion<Downstream.Failure>) {
+    func receive(completion: Subscribers.Completion<Failure>) {
         switch completion {
         case let .failure(e):
             forward(failure: e)
@@ -64,21 +68,40 @@ where Downstream: Subscriber, Downstream.Input == [Input] {
             forwardFinished()
         }
     }
+
+    func cancel() {
+        if stop {
+            assert(upstream == nil)
+            assert(result.isEmpty)
+            return
+        }
+        stop = true
+        let up = upstream
+        upstream = nil
+        result.removeAll(keepingCapacity: false)
+        up?.cancel()
+    }
 }
 
 public extension Publishers {
     /// A publisher that buffers a maximum number of items.
-    /// https://developer.apple.com/documentation/combine/publishers/collectbycount
-    struct CollectByCount<Upstream>: Publisher where Upstream : Publisher {
+    /// - seealso: [The Combine Library Reference]
+    ///     (https://developer.apple.com/documentation/combine/publishers/collectbycount)
+    struct CollectByCount<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = [Upstream.Output]
         public typealias Failure = Upstream.Failure
 
         public let count: Int
         public let upstream: Upstream
 
-        public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-            let connection = CollectByCountConnection(count, subscriber)
-            upstream.subscribe(connection)
+        init(upstream: Upstream, count: Int) {
+            self.upstream = upstream
+            self.count = count
+        }
+
+        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+            let pipe = CollectByCountPipe(subscriber, count)
+            upstream.subscribe(pipe)
         }
     }
 }

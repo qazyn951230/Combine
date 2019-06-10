@@ -20,8 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
-    typealias Input = Downstream.Input
+private final class IgnoreOutputPipe<Input, Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Failure = Downstream.Failure
 
     var stop = false
@@ -31,29 +30,31 @@ private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream
     init(_ downstream: Downstream) {
         self.downstream = downstream
     }
+
+    func receive(_ input: Input) -> Subscribers.Demand {
+        if stop {
+            return Subscribers.Demand.none
+        }
+        return Subscribers.Demand.unlimited
+    }
 }
 
 public extension Publishers {
-    /// A publisher that delivers elements to its downstream subscriber on a specific scheduler.
-    struct SubscribeOn<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
-        public typealias Output = Upstream.Output
+    /// A publisher that ignores all upstream elements, but passes along a completion state (finish or failed).
+    struct IgnoreOutput<Upstream>: Publisher where Upstream: Publisher {
+        public typealias Output = Never
         public typealias Failure = Upstream.Failure
 
-        public let options: Context.SchedulerOptions?
-        public let scheduler: Context
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        init(upstream: Upstream, scheduler: Context, options: Context.SchedulerOptions?) {
-            self.options = options
-            self.scheduler = scheduler
+        init(upstream: Upstream) {
             self.upstream = upstream
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = SubscribeOnOnPipe(subscriber)
-            scheduler.schedule(options: options) {
-                subscriber.receive(subscription: pipe)
-            }
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure, S.Input == Output {
+            let pipe = IgnoreOutputPipe<Upstream.Output, S>(subscriber)
+            upstream.subscribe(pipe)
         }
     }
 }

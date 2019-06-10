@@ -20,55 +20,73 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
-    where Downstream: Subscriber, Downstream.Input == Bool {
+private final class ComparisonPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+    typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let predicate: (Input) -> Bool
-    var result: Bool = true
+    let areInIncreasingOrder: (Input, Input) -> Bool
+    var result: Input?
 
-    init(_ downstream: Downstream, _ predicate: @escaping (Input) -> Bool) {
+    init(_ downstream: Downstream, _ areInIncreasingOrder: @escaping (Input, Input) -> Bool) {
         self.downstream = downstream
-        self.predicate = predicate
+        self.areInIncreasingOrder = areInIncreasingOrder
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
-        result = result && predicate(input)
+        if let _result = result {
+            if areInIncreasingOrder(_result, input) {
+                result = input
+            }
+        } else {
+            result = input
+        }
         return Subscribers.Demand.unlimited
     }
 
     func receive(completion: Subscribers.Completion<Failure>) {
         switch completion {
-        case let .failure(e):
-            forward(failure: e)
+        case .failure:
+            forward(completion: completion)
         case .finished:
-            _ = forward(result)
+            if let _result = result {
+                forward(_result)
+            }
             forwardFinished()
         }
+    }
+
+    func clean() {
+        result = nil
     }
 }
 
 public extension Publishers {
-    struct AllSatisfy<Upstream>: Publisher where Upstream: Publisher {
-        public typealias Output = Bool
+    /// A publisher that republishes items from another publisher only if
+    ///     each new item is in increasing order from the previously-published item.
+    struct Comparison<Upstream>: Publisher where Upstream: Publisher {
+        public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
 
-        public let predicate: (Upstream.Output) -> Bool
+        /// The publisher that this publisher receives elements from.
         public let upstream: Upstream
 
-        init(upstream: Upstream, predicate: @escaping (Upstream.Output) -> Bool) {
+        /// A closure that receives two elements and returns `true` if they are in increasing order.
+        public let areInIncreasingOrder: (Upstream.Output, Upstream.Output) -> Bool
+
+        init(upstream: Upstream, areInIncreasingOrder: @escaping (Output, Output) -> Bool) {
             self.upstream = upstream
-            self.predicate = predicate
+            self.areInIncreasingOrder = areInIncreasingOrder
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = AllSatisfyPipe(subscriber, predicate)
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
+        Upstream.Output == S.Input {
+            let pipe = ComparisonPipe(subscriber, areInIncreasingOrder)
             upstream.subscribe(pipe)
         }
     }

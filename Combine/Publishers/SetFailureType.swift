@@ -20,48 +20,62 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class MapErrorPipe<Failure, Downstream>: UpstreamPipe
-    where Downstream: Subscriber, Failure: Error {
+private final class SetFailureTypePipe<Downstream>: UpstreamPipe
+    where Downstream: Subscriber {
     typealias Input = Downstream.Input
+    typealias Failure = Never
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let transform: (Failure) -> Downstream.Failure
 
-    init(_ downstream: Downstream, _ transform: @escaping (Failure) -> Downstream.Failure) {
+    init(_ downstream: Downstream) {
         self.downstream = downstream
-        self.transform = transform
     }
 
-    func receive(completion: Subscribers.Completion<Failure>) {
+    func receive(completion: Subscribers.Completion<Never>) {
         if stop {
             return
         }
         switch completion {
+        case .failure:
+            assert(false)
         case .finished:
             forwardFinished()
-        case let .failure(error):
-            forward(failure: transform(error))
         }
     }
 }
 
 public extension Publishers {
-    struct MapError<Upstream, Failure>: Publisher where Upstream: Publisher, Failure: Error {
+    struct SetFailureType<Upstream, Failure>: Publisher
+        where Upstream: Publisher, Failure: Error, Upstream.Failure == Never {
+
+        /// The kind of values published by this publisher.
         public typealias Output = Upstream.Output
 
-        public let transform: (Upstream.Failure) -> Failure
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        public init(upstream: Upstream, _ map: @escaping (Upstream.Failure) -> Failure) {
+        /// Creates a publisher that appears to send a specified failure type.
+        ///
+        /// - Parameter upstream: The publisher from which this publisher receives elements.
+        public init(upstream: Upstream) {
             self.upstream = upstream
-            self.transform = map
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = MapErrorPipe(subscriber, transform)
-            upstream.subscribe(pipe)
+        /// This function is called to attach the specified `Subscriber` to this `Publisher` by `subscribe(_:)`
+        ///
+        /// - SeeAlso: `subscribe(_:)`
+        /// - Parameters:
+        ///     - subscriber: The subscriber to attach to this `Publisher`.
+        ///                   once attached it can begin to receive values.
+        public func receive<S>(subscriber: S) where Failure == S.Failure, S: Subscriber, Upstream.Output == S.Input {
+            let pipe = SetFailureTypePipe(subscriber)
+            upstream.receive(subscriber: pipe)
+        }
+
+        public func setFailureType<E>(to failure: E.Type) -> SetFailureType<Upstream, E> where E: Error {
+            return SetFailureType<Upstream, E>(upstream: upstream)
         }
     }
 }

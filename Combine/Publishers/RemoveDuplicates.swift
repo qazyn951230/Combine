@@ -20,40 +20,65 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
+    let predicate: (Input, Input) -> Bool
+    var values: [Input] = []
 
-    init(_ downstream: Downstream) {
+    init(_ downstream: Downstream, _ predicate: @escaping (Input, Input) -> Bool) {
         self.downstream = downstream
+        self.predicate = predicate
+    }
+
+    func receive(_ input: Input) -> Subscribers.Demand {
+        if stop {
+            return Subscribers.Demand.none
+        }
+        let contains = values.contains { (value: Input) in
+            self.predicate(input, value)
+        }
+        if contains {
+            return forward(input)
+        }
+        return Subscribers.Demand.unlimited
+    }
+
+    func cancel() {
+        if stop {
+            assert(upstream == nil)
+            assert(values.isEmpty)
+            return
+        }
+        stop = true
+        let up = upstream
+        upstream = nil
+        values.removeAll(keepingCapacity: false)
+        up?.cancel()
     }
 }
 
 public extension Publishers {
-    /// A publisher that delivers elements to its downstream subscriber on a specific scheduler.
-    struct SubscribeOn<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
+    struct RemoveDuplicates<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = Upstream.Output
         public typealias Failure = Upstream.Failure
 
-        public let options: Context.SchedulerOptions?
-        public let scheduler: Context
         public let upstream: Upstream
+        public let predicate: (Upstream.Output, Upstream.Output) -> Bool
 
-        init(upstream: Upstream, scheduler: Context, options: Context.SchedulerOptions?) {
-            self.options = options
-            self.scheduler = scheduler
+        init(upstream: Upstream, predicate: @escaping (Upstream.Output, Upstream.Output) -> Bool) {
             self.upstream = upstream
+            self.predicate = predicate
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = SubscribeOnOnPipe(subscriber)
-            scheduler.schedule(options: options) {
-                subscriber.receive(subscription: pipe)
-            }
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
+            Upstream.Output == S.Input {
+            let pipe = RemoveDuplicatesPipe(subscriber, predicate)
+            upstream.subscribe(pipe)
         }
     }
 }

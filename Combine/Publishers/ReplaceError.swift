@@ -20,40 +20,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+private final class ReplaceErrorPipe<Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Failure: Error, Downstream.Failure == Never {
     typealias Input = Downstream.Input
-    typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
+    let input: Input
 
-    init(_ downstream: Downstream) {
+    init(_ downstream: Downstream, _ input: Input) {
         self.downstream = downstream
+        self.input = input
+    }
+
+    func receive(completion: Subscribers.Completion<Failure>) {
+        switch completion {
+        case .failure:
+            forward(input)
+            cancel()
+        case .finished:
+            forwardFinished()
+        }
     }
 }
 
 public extension Publishers {
-    /// A publisher that delivers elements to its downstream subscriber on a specific scheduler.
-    struct SubscribeOn<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
+    /// A publisher that replaces any errors in the stream with a provided element.
+    struct ReplaceError<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = Upstream.Output
-        public typealias Failure = Upstream.Failure
+        public typealias Failure = Never
 
-        public let options: Context.SchedulerOptions?
-        public let scheduler: Context
+        /// The element with which to replace errors from the upstream publisher.
+        public let output: Upstream.Output
+
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        init(upstream: Upstream, scheduler: Context, options: Context.SchedulerOptions?) {
-            self.options = options
-            self.scheduler = scheduler
+        public init(upstream: Upstream, output: Upstream.Output) {
+            self.output = output
             self.upstream = upstream
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = SubscribeOnOnPipe(subscriber)
-            scheduler.schedule(options: options) {
-                subscriber.receive(subscription: pipe)
-            }
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Output == S.Input, S.Failure == Failure {
+            let pipe = ReplaceErrorPipe<Upstream.Failure, S>(subscriber, output)
+            upstream.subscribe(pipe)
         }
     }
 }

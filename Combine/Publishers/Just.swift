@@ -1,24 +1,43 @@
+// MIT License
 //
-//  Just.swift
-//  Combine
+// Copyright (c) 2017-present qazyn951230 qazyn951230@gmail.com
 //
-//  Created by Nan Yang on 2019/6/5.
-//  Copyright © 2019 Nan Yang. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-private final class JustConnection<Downstream>: Connection<Downstream> where Downstream: Subscriber {
-    let input: Downstream.Input
+private final class JustPipe<Downstream>: Pipe where Downstream: Subscriber {
+    typealias Input = Downstream.Input
+    typealias Failure = Downstream.Failure
 
-    init(_ input: Downstream.Input, _ downstream: Downstream) {
+    var stop = false
+    let downstream: Downstream
+    let input: Input
+
+    init(_ downstream: Downstream, _ input: Input) {
+        self.downstream = downstream
         self.input = input
-        super.init(downstream)
     }
 
-    override func request(_ demand: Subscribers.Demand) {
+    func request(_ demand: Subscribers.Demand) {
         if demand.many {
-            _ = forward(input)
+            forward(input)
         }
-        forward(completion: Subscribers.Completion.finished)
+        forwardFinished()
     }
 }
 
@@ -32,9 +51,9 @@ public extension Publishers {
             self.output = output
         }
 
-        public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
-            let connection = JustConnection(output, subscriber)
-            subscriber.receive(subscription: connection)
+        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+            let pipe = JustPipe(subscriber, output)
+            subscriber.receive(subscription: pipe)
         }
     }
 }
@@ -46,7 +65,7 @@ public extension Publishers.Just {
 }
 
 extension Publishers.Just: Equatable where Output: Equatable {
-    public static func == (lhs: Publishers.Just<Output>, rhs: Publishers.Just<Output>) -> Bool {
+    public static func ==(lhs: Publishers.Just<Output>, rhs: Publishers.Just<Output>) -> Bool {
         return lhs.output == rhs.output
     }
 }

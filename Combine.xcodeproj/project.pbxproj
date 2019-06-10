@@ -7,6 +7,27 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AC96A0D67A1EA49D12BC24E2 /* Comparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AD083BDE1640EEB10798 /* Comparison.swift */; };
+		AC96A1BACDE6D9CCF0593AE6 /* CollectByTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A7A0535961DC9A376D05 /* CollectByTime.swift */; };
+		AC96A1EBE1FBF7DD56D02870 /* IgnoreOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A98A1FD46D5185BAC9F3 /* IgnoreOutput.swift */; };
+		AC96A27F4A5E04D5E58A0668 /* TryRemoveDuplicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A25C45A960EAB01A8996 /* TryRemoveDuplicates.swift */; };
+		AC96A2C9B3B70BBEB95618B2 /* UpstreamPipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AA745A5AFC5916AB7DA1 /* UpstreamPipe.swift */; };
+		AC96A3D7557F5CF59802B040 /* CompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */; };
+		AC96A4369F6B1FEC4546E778 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A8D7AA35C60A7905CFAF /* Filter.swift */; };
+		AC96A5BA2E62C23BAA2E21D1 /* TryReduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */; };
+		AC96A7F0528F0C7A46CA5E34 /* Count.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A15A6403BC6D8DC47C9E /* Count.swift */; };
+		AC96A8532B6A9FD8936D4E57 /* TryContainsWhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */; };
+		AC96A98283FDED96CACFBE04 /* TryScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A620FA080826E58A410A /* TryScan.swift */; };
+		AC96A9B0FA116E8CBF9BDD37 /* SetFailureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AEC54F2AB29B209AC3E3 /* SetFailureType.swift */; };
+		AC96AC33FB7E147768E77125 /* Reduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A924BD258EE1ACD21C1A /* Reduce.swift */; };
+		AC96AD40FB6D7F6A2527E935 /* TryCompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AB3BEB6B54D76B7126BF /* TryCompactMap.swift */; };
+		AC96ADB3D79338D43CAADD2E /* TryFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A27B4B37C85EC62CB5F9 /* TryFilter.swift */; };
+		AC96ADD2F457E2033585F93D /* ReplaceEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AFE8282BB17223703859 /* ReplaceEmpty.swift */; };
+		AC96ADF128A9D125A379F7EF /* ReplaceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AFC7CDF5610BB06264AB /* ReplaceError.swift */; };
+		AC96AE0AF7643F0F18C4063D /* ContainsWhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A1B84DDC04F72CC92943 /* ContainsWhere.swift */; };
+		AC96AE26C192DF26952DB105 /* RemoveDuplicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AFB525B116034F0D3266 /* RemoveDuplicates.swift */; };
+		AC96AE72A8CBD93E6A50F525 /* Contains.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96ADDBF24E923CCA767909 /* Contains.swift */; };
+		AC96AF0B1A7BB91D91E4520E /* TryComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AE042BE4DF37808206CA /* TryComparison.swift */; };
 		BC2EB4D822A94E48009A0E54 /* MapError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4D722A94E48009A0E54 /* MapError.swift */; };
 		BC2EB4DB22A9539B009A0E54 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */; };
 		BC2EB4DD22AD48A1009A0E54 /* Scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DC22AD48A1009A0E54 /* Scan.swift */; };
@@ -33,9 +54,7 @@
 		BCD4D76222A7726A00DE874F /* Completion.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76122A7726A00DE874F /* Completion.swift */; };
 		BCD4D76422A772F900DE874F /* Sink.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76322A772F900DE874F /* Sink.swift */; };
 		BCD4D76722A793C700DE874F /* Just.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76622A793C700DE874F /* Just.swift */; };
-		BCD4D76D22A7A35E00DE874F /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76C22A7A35E00DE874F /* Connection.swift */; };
-		BCD4D76F22A7A57700DE874F /* UpstreamConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */; };
-		BCD4D77122A7B7D200DE874F /* ForwardConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D77022A7B7D200DE874F /* ForwardConnection.swift */; };
+		BCD4D76D22A7A35E00DE874F /* Pipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D76C22A7A35E00DE874F /* Pipe.swift */; };
 		BCEAFBBA22A8F7B900ABF36B /* FlatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB622A8F7B900ABF36B /* FlatMap.swift */; };
 		BCEAFBBB22A8F7B900ABF36B /* TryMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB722A8F7B900ABF36B /* TryMap.swift */; };
 		BCEAFBBC22A8F7B900ABF36B /* ReceiveOn.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEAFBB822A8F7B900ABF36B /* ReceiveOn.swift */; };
@@ -62,6 +81,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AC96A15A6403BC6D8DC47C9E /* Count.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Count.swift; sourceTree = "<group>"; };
+		AC96A1B84DDC04F72CC92943 /* ContainsWhere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainsWhere.swift; sourceTree = "<group>"; };
+		AC96A25C45A960EAB01A8996 /* TryRemoveDuplicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryRemoveDuplicates.swift; sourceTree = "<group>"; };
+		AC96A27B4B37C85EC62CB5F9 /* TryFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryFilter.swift; sourceTree = "<group>"; };
+		AC96A620FA080826E58A410A /* TryScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryScan.swift; sourceTree = "<group>"; };
+		AC96A7A0535961DC9A376D05 /* CollectByTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectByTime.swift; sourceTree = "<group>"; };
+		AC96A8D7AA35C60A7905CFAF /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
+		AC96A924BD258EE1ACD21C1A /* Reduce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reduce.swift; sourceTree = "<group>"; };
+		AC96A98A1FD46D5185BAC9F3 /* IgnoreOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IgnoreOutput.swift; sourceTree = "<group>"; };
+		AC96AA745A5AFC5916AB7DA1 /* UpstreamPipe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpstreamPipe.swift; sourceTree = "<group>"; };
+		AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryReduce.swift; sourceTree = "<group>"; };
+		AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryContainsWhere.swift; sourceTree = "<group>"; };
+		AC96AB3BEB6B54D76B7126BF /* TryCompactMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryCompactMap.swift; sourceTree = "<group>"; };
+		AC96AD083BDE1640EEB10798 /* Comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparison.swift; sourceTree = "<group>"; };
+		AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompactMap.swift; sourceTree = "<group>"; };
+		AC96ADDBF24E923CCA767909 /* Contains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Contains.swift; sourceTree = "<group>"; };
+		AC96AE042BE4DF37808206CA /* TryComparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryComparison.swift; sourceTree = "<group>"; };
+		AC96AEC54F2AB29B209AC3E3 /* SetFailureType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SetFailureType.swift; sourceTree = "<group>"; };
+		AC96AFB525B116034F0D3266 /* RemoveDuplicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveDuplicates.swift; sourceTree = "<group>"; };
+		AC96AFC7CDF5610BB06264AB /* ReplaceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceError.swift; sourceTree = "<group>"; };
+		AC96AFE8282BB17223703859 /* ReplaceEmpty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceEmpty.swift; sourceTree = "<group>"; };
 		BC2EB4D722A94E48009A0E54 /* MapError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapError.swift; sourceTree = "<group>"; };
 		BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscriptions.swift; sourceTree = "<group>"; };
 		BC2EB4DC22AD48A1009A0E54 /* Scan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scan.swift; sourceTree = "<group>"; };
@@ -91,9 +131,7 @@
 		BCD4D76122A7726A00DE874F /* Completion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Completion.swift; sourceTree = "<group>"; };
 		BCD4D76322A772F900DE874F /* Sink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sink.swift; sourceTree = "<group>"; };
 		BCD4D76622A793C700DE874F /* Just.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Just.swift; sourceTree = "<group>"; };
-		BCD4D76C22A7A35E00DE874F /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
-		BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpstreamConnection.swift; sourceTree = "<group>"; };
-		BCD4D77022A7B7D200DE874F /* ForwardConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardConnection.swift; sourceTree = "<group>"; };
+		BCD4D76C22A7A35E00DE874F /* Pipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pipe.swift; sourceTree = "<group>"; };
 		BCEAFBB622A8F7B900ABF36B /* FlatMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlatMap.swift; sourceTree = "<group>"; };
 		BCEAFBB722A8F7B900ABF36B /* TryMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryMap.swift; sourceTree = "<group>"; };
 		BCEAFBB822A8F7B900ABF36B /* ReceiveOn.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReceiveOn.swift; sourceTree = "<group>"; };
@@ -207,6 +245,26 @@
 				BCD4D74E22A75E1B00DE874F /* Sequence.swift */,
 				BCEAFBB922A8F7B900ABF36B /* SubscribeOn.swift */,
 				BCEAFBB722A8F7B900ABF36B /* TryMap.swift */,
+				AC96A620FA080826E58A410A /* TryScan.swift */,
+				AC96AEC54F2AB29B209AC3E3 /* SetFailureType.swift */,
+				AC96A8D7AA35C60A7905CFAF /* Filter.swift */,
+				AC96A27B4B37C85EC62CB5F9 /* TryFilter.swift */,
+				AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */,
+				AC96AB3BEB6B54D76B7126BF /* TryCompactMap.swift */,
+				AC96AFB525B116034F0D3266 /* RemoveDuplicates.swift */,
+				AC96A25C45A960EAB01A8996 /* TryRemoveDuplicates.swift */,
+				AC96AFE8282BB17223703859 /* ReplaceEmpty.swift */,
+				AC96AFC7CDF5610BB06264AB /* ReplaceError.swift */,
+				AC96A7A0535961DC9A376D05 /* CollectByTime.swift */,
+				AC96A98A1FD46D5185BAC9F3 /* IgnoreOutput.swift */,
+				AC96A924BD258EE1ACD21C1A /* Reduce.swift */,
+				AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */,
+				AC96A15A6403BC6D8DC47C9E /* Count.swift */,
+				AC96AD083BDE1640EEB10798 /* Comparison.swift */,
+				AC96AE042BE4DF37808206CA /* TryComparison.swift */,
+				AC96ADDBF24E923CCA767909 /* Contains.swift */,
+				AC96A1B84DDC04F72CC92943 /* ContainsWhere.swift */,
+				AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */,
 			);
 			path = Publishers;
 			sourceTree = "<group>";
@@ -226,9 +284,8 @@
 		BCD4D76B22A7A22D00DE874F /* Internal */ = {
 			isa = PBXGroup;
 			children = (
-				BCD4D76C22A7A35E00DE874F /* Connection.swift */,
-				BCD4D77022A7B7D200DE874F /* ForwardConnection.swift */,
-				BCD4D76E22A7A57700DE874F /* UpstreamConnection.swift */,
+				BCD4D76C22A7A35E00DE874F /* Pipe.swift */,
+				AC96AA745A5AFC5916AB7DA1 /* UpstreamPipe.swift */,
 			);
 			path = Internal;
 			sourceTree = "<group>";
@@ -374,7 +431,7 @@
 				BCEAFBBA22A8F7B900ABF36B /* FlatMap.swift in Sources */,
 				BCD4D74D22A75D2900DE874F /* Empty.swift in Sources */,
 				BCED60D822A8C1EE00CE5277 /* CollectByCount.swift in Sources */,
-				BCD4D76D22A7A35E00DE874F /* Connection.swift in Sources */,
+				BCD4D76D22A7A35E00DE874F /* Pipe.swift in Sources */,
 				BCEAFBBB22A8F7B900ABF36B /* TryMap.swift in Sources */,
 				BCED60D222A8B83900CE5277 /* Autoconnect.swift in Sources */,
 				BCED60D622A8C07800CE5277 /* Collect.swift in Sources */,
@@ -388,10 +445,29 @@
 				BCD4D74F22A75E1B00DE874F /* Sequence.swift in Sources */,
 				BCD4D75322A7608A00DE874F /* Map.swift in Sources */,
 				BCD4D76222A7726A00DE874F /* Completion.swift in Sources */,
-				BCD4D77122A7B7D200DE874F /* ForwardConnection.swift in Sources */,
 				BCD4D76022A7708E00DE874F /* CombineIdentifier.swift in Sources */,
-				BCD4D76F22A7A57700DE874F /* UpstreamConnection.swift in Sources */,
 				BCD4D73E22A7592500DE874F /* Subscriber.swift in Sources */,
+				AC96A98283FDED96CACFBE04 /* TryScan.swift in Sources */,
+				AC96A9B0FA116E8CBF9BDD37 /* SetFailureType.swift in Sources */,
+				AC96A2C9B3B70BBEB95618B2 /* UpstreamPipe.swift in Sources */,
+				AC96A4369F6B1FEC4546E778 /* Filter.swift in Sources */,
+				AC96ADB3D79338D43CAADD2E /* TryFilter.swift in Sources */,
+				AC96A3D7557F5CF59802B040 /* CompactMap.swift in Sources */,
+				AC96AD40FB6D7F6A2527E935 /* TryCompactMap.swift in Sources */,
+				AC96AE26C192DF26952DB105 /* RemoveDuplicates.swift in Sources */,
+				AC96A27F4A5E04D5E58A0668 /* TryRemoveDuplicates.swift in Sources */,
+				AC96ADD2F457E2033585F93D /* ReplaceEmpty.swift in Sources */,
+				AC96ADF128A9D125A379F7EF /* ReplaceError.swift in Sources */,
+				AC96A1BACDE6D9CCF0593AE6 /* CollectByTime.swift in Sources */,
+				AC96A1EBE1FBF7DD56D02870 /* IgnoreOutput.swift in Sources */,
+				AC96AC33FB7E147768E77125 /* Reduce.swift in Sources */,
+				AC96A5BA2E62C23BAA2E21D1 /* TryReduce.swift in Sources */,
+				AC96A7F0528F0C7A46CA5E34 /* Count.swift in Sources */,
+				AC96A0D67A1EA49D12BC24E2 /* Comparison.swift in Sources */,
+				AC96AF0B1A7BB91D91E4520E /* TryComparison.swift in Sources */,
+				AC96AE72A8CBD93E6A50F525 /* Contains.swift in Sources */,
+				AC96AE0AF7643F0F18C4063D /* ContainsWhere.swift in Sources */,
+				AC96A8532B6A9FD8936D4E57 /* TryContainsWhere.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

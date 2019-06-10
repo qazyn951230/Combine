@@ -20,17 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
-    where Downstream: Subscriber, Downstream.Input == Bool {
-    typealias Failure = Downstream.Failure
+private final class TryRemoveDuplicatesPipe<Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Failure: Error, Downstream.Failure == Error {
+    typealias Input = Downstream.Input
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let predicate: (Input) -> Bool
-    var result: Bool = true
+    let predicate: (Input, Input) throws -> Bool
+    var values: [Input] = []
 
-    init(_ downstream: Downstream, _ predicate: @escaping (Input) -> Bool) {
+    init(_ downstream: Downstream, _ predicate: @escaping (Input, Input) throws -> Bool) {
         self.downstream = downstream
         self.predicate = predicate
     }
@@ -39,8 +39,17 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         if stop {
             return Subscribers.Demand.none
         }
-        result = result && predicate(input)
-        return Subscribers.Demand.unlimited
+        do {
+            let contains = try values.contains { (value: Input) in
+                try self.predicate(input, value)
+            }
+            if contains {
+                return forward(input)
+            }
+        } catch let failure {
+            forward(failure: failure)
+        }
+        return Subscribers.Demand.none
     }
 
     func receive(completion: Subscribers.Completion<Failure>) {
@@ -48,27 +57,39 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         case let .failure(e):
             forward(failure: e)
         case .finished:
-            _ = forward(result)
             forwardFinished()
         }
+    }
+
+    func cancel() {
+        if stop {
+            assert(upstream == nil)
+            assert(values.isEmpty)
+            return
+        }
+        stop = true
+        let up = upstream
+        upstream = nil
+        values.removeAll(keepingCapacity: false)
+        up?.cancel()
     }
 }
 
 public extension Publishers {
-    struct AllSatisfy<Upstream>: Publisher where Upstream: Publisher {
-        public typealias Output = Bool
-        public typealias Failure = Upstream.Failure
+    struct TryRemoveDuplicates<Upstream>: Publisher where Upstream: Publisher {
+        public typealias Output = Upstream.Output
+        public typealias Failure = Error
 
-        public let predicate: (Upstream.Output) -> Bool
         public let upstream: Upstream
+        public let predicate: (Upstream.Output, Upstream.Output) throws -> Bool
 
-        init(upstream: Upstream, predicate: @escaping (Upstream.Output) -> Bool) {
+        init(upstream: Upstream, predicate: @escaping (Upstream.Output, Upstream.Output) throws -> Bool) {
             self.upstream = upstream
             self.predicate = predicate
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = AllSatisfyPipe(subscriber, predicate)
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Output == S.Input, S.Failure == Failure {
+            let pipe = TryRemoveDuplicatesPipe<Upstream.Failure, S>(subscriber, predicate)
             upstream.subscribe(pipe)
         }
     }

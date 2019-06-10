@@ -20,55 +20,63 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
-    where Downstream: Subscriber, Downstream.Input == Bool {
+private final class ReducePipe<Input, Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let predicate: (Input) -> Bool
-    var result: Bool = true
+    var result: Downstream.Input
+    let next: (Downstream.Input, Input) -> Downstream.Input
 
-    init(_ downstream: Downstream, _ predicate: @escaping (Input) -> Bool) {
+    init(_ downstream: Downstream, _ initial: Downstream.Input,
+         _ next: @escaping (Downstream.Input, Input) -> Downstream.Input) {
         self.downstream = downstream
-        self.predicate = predicate
+        self.result = initial
+        self.next = next
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
-        result = result && predicate(input)
+        result = next(result, input)
         return Subscribers.Demand.unlimited
     }
 
-    func receive(completion: Subscribers.Completion<Failure>) {
+    func receive(completion: Subscribers.Completion<Downstream.Failure>) {
         switch completion {
-        case let .failure(e):
-            forward(failure: e)
+        case let .failure(error):
+            forward(failure: error)
         case .finished:
-            _ = forward(result)
+            forward(result)
             forwardFinished()
         }
     }
 }
 
 public extension Publishers {
-    struct AllSatisfy<Upstream>: Publisher where Upstream: Publisher {
-        public typealias Output = Bool
+    /// A publisher that applies a closure to all received elements and
+    ///     produces an accumulated value when the upstream publisher finishes.
+    struct Reduce<Upstream, Output>: Publisher where Upstream: Publisher {
         public typealias Failure = Upstream.Failure
-
-        public let predicate: (Upstream.Output) -> Bool
         public let upstream: Upstream
 
-        init(upstream: Upstream, predicate: @escaping (Upstream.Output) -> Bool) {
+        /// The initial value provided on the first invocation of the closure.
+        public let initial: Output
+
+        /// A closure that takes the previously-accumulated value and the next element from
+        ///     the upstream publisher to produce a new value.
+        public let nextPartialResult: (Output, Upstream.Output) -> Output
+
+        init(upstream: Upstream, initial: Output, next: @escaping (Output, Upstream.Output) -> Output) {
             self.upstream = upstream
-            self.predicate = predicate
+            self.initial = initial
+            self.nextPartialResult = next
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = AllSatisfyPipe(subscriber, predicate)
+        public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, Upstream.Failure == S.Failure {
+            let pipe = ReducePipe(subscriber, initial, nextPartialResult)
             upstream.subscribe(pipe)
         }
     }

@@ -20,40 +20,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
-    typealias Input = Downstream.Input
+private final class CompactMapPipe<Input, Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
+    let transform: (Input) -> Downstream.Input?
 
-    init(_ downstream: Downstream) {
+    init(_ downstream: Downstream, _ transform: @escaping (Input) -> Downstream.Input?) {
         self.downstream = downstream
+        self.transform = transform
+    }
+
+    func receive(_ input: Input) -> Subscribers.Demand {
+        if stop {
+            return Subscribers.Demand.none
+        }
+        if let next = transform(input) {
+            return forward(next)
+        }
+        return Subscribers.Demand.unlimited
     }
 }
 
 public extension Publishers {
-    /// A publisher that delivers elements to its downstream subscriber on a specific scheduler.
-    struct SubscribeOn<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
-        public typealias Output = Upstream.Output
+    /// A publisher that republishes all non-`nil` results of calling a closure with each received element.
+    struct CompactMap<Upstream, Output>: Publisher where Upstream: Publisher {
         public typealias Failure = Upstream.Failure
 
-        public let options: Context.SchedulerOptions?
-        public let scheduler: Context
+        /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        init(upstream: Upstream, scheduler: Context, options: Context.SchedulerOptions?) {
-            self.options = options
-            self.scheduler = scheduler
+        /// A closure that receives values from the upstream publisher and returns optional values.
+        public let transform: (Upstream.Output) -> Output?
+
+        init(upstream: Upstream, transform: @escaping (Upstream.Output) -> Output?) {
             self.upstream = upstream
+            self.transform = transform
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = SubscribeOnOnPipe(subscriber)
-            scheduler.schedule(options: options) {
-                subscriber.receive(subscription: pipe)
-            }
+        public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, Upstream.Failure == S.Failure {
+            let pipe = CompactMapPipe(subscriber, transform)
+            upstream.subscribe(pipe)
         }
     }
 }
