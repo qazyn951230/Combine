@@ -446,6 +446,27 @@ public extension Publisher {
         return Publishers.AllSatisfy(upstream: self, predicate: predicate)
     }
 
+    /// Publishes a single Boolean value that indicates whether all received elements pass a given error-throwing predicate.
+    ///
+    /// When this publisher receives an element, it runs the predicate against the element.
+    ///     If the predicate returns `false`, the publisher produces a `false` value and finishes.
+    ///     If the upstream publisher finishes normally, this publisher produces a `true` value and finishes.
+    ///     If the predicate throws an error, the publisher fails, passing the error to its downstream.
+    ///     As a `reduce`-style operator, this publisher produces at most one value.
+    /// Backpressure note: Upon receiving any request greater than zero,
+    ///     this publisher requests unlimited elements from the upstream publisher.
+    /// - Parameter predicate:  A closure that evaluates each received element.
+    ///         Return `true` to continue, or `false` to cancel the upstream and complete.
+    ///         The closure may throw, in which case the publisher cancels the upstream publisher and
+    ///         fails with the thrown error.
+    /// - Returns:  A publisher that publishes a Boolean value that indicates whether
+    ///         all received elements pass a given predicate.
+    func tryAllSatisfy(_ predicate: @escaping (Output) throws -> Bool) -> Publishers.TryAllSatisfy<Self> {
+        return Publishers.TryAllSatisfy(upstream: self, predicate: predicate)
+    }
+
+    // MARK: - Applying Sequence Operations to Elements
+
     // MARK: - Instance Methods
     func eraseToAnyPublisher() -> AnyPublisher<Output, Failure> {
         return AnyPublisher(self)
