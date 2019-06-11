@@ -20,12 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public protocol CustomCombineIdentifierConvertible {
-    var combineIdentifier: CombineIdentifier { get }
-}
-
-public extension CustomCombineIdentifierConvertible where Self : AnyObject {
-    var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(self)
-    }
+/// A protocol that provides a scheduler with an expression for relative time.
+public protocol SchedulerTimeIntervalConvertible {
+    static func microseconds(_ us: Int) -> Self
+    static func milliseconds(_ ms: Int) -> Self
+    static func nanoseconds(_ ns: Int) -> Self
+    static func seconds(_ s: Double) -> Self
+    static func seconds(_ s: Int) -> Self
 }

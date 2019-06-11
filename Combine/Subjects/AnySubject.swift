@@ -20,6 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A type-erasing subject.
+/// - seealso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/anysubject)
+///
+/// Use AnySubject to wrap a subject whose type has details you don’t want to
+///     expose to subscribers or other publishers.
 public final class AnySubject<Output, Failure>: Subject where Failure: Error {
     private let subscribe: (AnySubscriber<Output, Failure>) -> Void
     private let receive: (Output) -> Void
@@ -49,10 +55,17 @@ public final class AnySubject<Output, Failure>: Subject where Failure: Error {
         subscribe(AnySubscriber(subscriber))
     }
 
+    /// Sends a value to the subscriber.
+    ///
+    /// - Parameter value: The value to send.
     public func send(_ value: Output) {
         receive(value)
     }
 
+    /// Sends a completion signal to the subscriber.
+    ///
+    /// - Parameter completion: A `Completion` instance which indicates whether
+    ///         publishing has finished normally or failed with an error.
     public func send(completion: Subscribers.Completion<Failure>) {
         receiveCompletion(completion)
     }

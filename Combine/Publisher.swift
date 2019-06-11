@@ -446,7 +446,8 @@ public extension Publisher {
         return Publishers.AllSatisfy(upstream: self, predicate: predicate)
     }
 
-    /// Publishes a single Boolean value that indicates whether all received elements pass a given error-throwing predicate.
+    /// Publishes a single Boolean value that indicates whether all received elements
+    ///     pass a given error-throwing predicate.
     ///
     /// When this publisher receives an element, it runs the predicate against the element.
     ///     If the predicate returns `false`, the publisher produces a `false` value and finishes.
@@ -466,6 +467,25 @@ public extension Publisher {
     }
 
     // MARK: - Applying Sequence Operations to Elements
+
+    /// Ignores elements from the upstream publisher until it receives an element from a second publisher.
+    ///
+    /// This publisher requests a single value from the upstream publisher,
+    ///     and it ignores (drops) all elements from that publisher until the upstream publisher produces a value.
+    ///     After the `other` publisher produces an element, this publisher cancels its subscription to
+    ///     the `other` publisher, and allows events from the `upstream` publisher to pass through.
+    /// After this publisher receives a subscription from the upstream publisher,
+    ///     it passes through backpressure requests from downstream to the upstream publisher.
+    ///     If the upstream publisher acts on those requests before the other publisher produces an item,
+    ///     this publisher drops the elements it receives from the upstream publisher.
+    ///
+    /// - Parameter publisher: A publisher to monitor for its first emitted element.
+    /// - Returns: A publisher that drops elements from the upstream publisher until
+    ///         the `other` publisher produces a value.
+    func drop<P>(untilOutputFrom publisher: P) -> Publishers.DropUntilOutput<Self, P>
+        where P : Publisher, Self.Failure == P.Failure {
+        return Publishers.DropUntilOutput(upstream: self, other: publisher)
+    }
 
     // MARK: - Instance Methods
     func eraseToAnyPublisher() -> AnyPublisher<Output, Failure> {

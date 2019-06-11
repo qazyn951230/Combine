@@ -21,22 +21,55 @@
 // SOFTWARE.
 
 public final class PassthroughSubject<Output, Failure>: Subject where Failure: Error {
-    private var downstream: AnySubscriber<Output, Failure>?
+    private var subscribers = Bag<AnySubscriber<Output, Failure>>()
+    private var lock = MutexLock(recursive: true)
+    private var stop = false
 
     public init() {
-        downstream = nil
+        // Do nothing.
     }
 
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-        downstream = AnySubscriber(subscriber)
+        lock.locking {
+            if stop {
+                return
+            }
+            _ = subscribers.update(with: AnySubscriber(subscriber))
+        }
     }
 
     public func send(_ value: Output) {
-        _ = downstream?.receive(value)
+        if stop {
+            return
+        }
+        let set = lock.locking { () -> Bag<AnySubscriber<Output, Failure>> in
+            return subscribers
+        }
+        receive(value, set: set)
     }
 
     public func send(completion: Subscribers.Completion<Failure>) {
-        downstream?.receive(completion: completion)
-        downstream = nil
+        if stop {
+            return
+        }
+        stop = true
+        let set = lock.locking { () -> Bag<AnySubscriber<Output, Failure>> in
+            let temp = subscribers
+            subscribers.removeAll(keepingCapacity: false)
+            return temp
+        }
+        receive(completion: completion, set: set)
+    }
+
+    private func receive(_ input: Output, set: Bag<AnySubscriber<Output, Failure>>) {
+        set.forEach { item in
+            _ = item.receive(input)
+        }
+    }
+
+    private func receive(completion: Subscribers.Completion<Failure>, set: Bag<AnySubscriber<Output, Failure>>) {
+        set.forEach { item in
+            item.receive(completion: completion)
+        }
     }
 }

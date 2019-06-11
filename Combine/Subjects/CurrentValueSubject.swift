@@ -22,7 +22,9 @@
 
 /// A subject that wraps a single value and publishes a new element whenever the value changes.
 public final class CurrentValueSubject<Output, Failure>: Subject where Failure: Error {
-    private var downstream: AnySubscriber<Output, Failure>?
+    private var subscribers = Bag<AnySubscriber<Output, Failure>>()
+    private var lock = MutexLock(recursive: true)
+    private var stop = false
     public var _value: Output
     public var value: Output {
         get {
@@ -39,16 +41,48 @@ public final class CurrentValueSubject<Output, Failure>: Subject where Failure: 
     }
 
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-        downstream = AnySubscriber(subscriber)
+        lock.locking {
+            if stop {
+                return
+            }
+            _ = subscribers.update(with: AnySubscriber(subscriber))
+            _ = subscriber.receive(_value)
+        }
     }
 
     public func send(_ value: Output) {
-        _value = value
-        _ = downstream?.receive(value)
+        if stop {
+            return
+        }
+        let set = lock.locking { () -> Bag<AnySubscriber<Output, Failure>> in
+            _value = value
+            return subscribers
+        }
+        receive(value, set: set)
     }
 
     public func send(completion: Subscribers.Completion<Failure>) {
-        downstream?.receive(completion: completion)
-        downstream = nil
+        if stop {
+            return
+        }
+        stop = true
+        let set = lock.locking { () -> Bag<AnySubscriber<Output, Failure>> in
+            let temp = subscribers
+            subscribers.removeAll(keepingCapacity: false)
+            return temp
+        }
+        receive(completion: completion, set: set)
+    }
+
+    private func receive(_ input: Output, set: Bag<AnySubscriber<Output, Failure>>) {
+        set.forEach { item in
+            _ = item.receive(input)
+        }
+    }
+
+    private func receive(completion: Subscribers.Completion<Failure>, set: Bag<AnySubscriber<Output, Failure>>) {
+        set.forEach { item in
+            item.receive(completion: completion)
+        }
     }
 }

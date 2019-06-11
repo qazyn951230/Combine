@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct CombineIdentifier: CustomStringConvertible, Hashable {
+public struct CombineIdentifier: Hashable, CustomStringConvertible {
     public init() {
     }
 

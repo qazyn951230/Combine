@@ -20,19 +20,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public struct AnyPublisher<Output, Failure>: Publisher where Failure: Error {
-    private let receiveSubscriber: (AnySubscriber<Output, Failure>) -> Void
+/// A type-erasing publisher.
+/// - seealso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/anypublisher)
+///
+/// Use `AnyPublisher` to wrap a publisher whose type has details you don’t want to
+///     expose to subscribers or other publishers.
+public struct AnyPublisher<Output, Failure> where Failure: Error {
+    // https://github.com/apple/swift-evolution/blob/master/proposals/0193-cross-module-inlining-and-specialization.md
+    @usableFromInline
+    let receiveSubscriber: (AnySubscriber<Output, Failure>) -> Void
 
+    /// Creates a type-erasing publisher to wrap the provided publisher.
+    ///
+    /// - Parameters:
+    ///   - publisher: A publisher to wrap with a type-eraser.
+    @inlinable
     public init<P>(_ publisher: P) where Output == P.Output, Failure == P.Failure, P: Publisher {
-        self.init { s in
+        receiveSubscriber = { s in
             publisher.receive(subscriber: s)
         }
     }
 
+    /// Creates a type-erasing publisher implemented by the provided closure.
+    ///
+    /// - Parameters:
+    ///   - subscribe: A closure to invoke when a subscriber subscribes to the publisher.
+    @inlinable
     public init(_ subscribe: @escaping (AnySubscriber<Output, Failure>) -> Void) {
         receiveSubscriber = subscribe
     }
+}
 
+extension AnyPublisher : Publisher {
+    @inlinable
     public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         receiveSubscriber(AnySubscriber(subscriber))
     }

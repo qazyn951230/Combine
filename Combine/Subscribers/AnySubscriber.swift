@@ -20,9 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A type-erasing subscriber.
+/// - seealso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/anysubscriber)
+///
+/// Use an `AnySubscriber` to wrap an existing subscriber whose details you don’t want to expose.
+/// You can also use `AnySubscriber` to create a custom subscriber by
+///     providing closures for `Subscriber`’s methods, rather than implementing `Subscriber` directly.
 public struct AnySubscriber<Input, Failure>: Subscriber,
     CustomStringConvertible, CustomReflectable, CustomPlaygroundDisplayConvertible
     where Failure: Error {
+    public let combineIdentifier: CombineIdentifier
     let receiveSubscription: (Subscription) -> Void
     let receiveValue: (Input) -> Subscribers.Demand
     let receiveCompletion: (Subscribers.Completion<Failure>) -> Void
@@ -37,6 +45,7 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
         receiveCompletion = { i in
             s.receive(completion: i)
         }
+        combineIdentifier = s.combineIdentifier
     }
 
     public init<S>(_ s: S) where Input == S.Output, Failure == S.Failure, S: Subject {
@@ -50,14 +59,16 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
         receiveCompletion = { i in
             s.send(completion: i)
         }
+        combineIdentifier = CombineIdentifier()
     }
 
     public init(receiveSubscription: ((Subscription) -> Void)? = nil,
                 receiveValue: ((Input) -> Subscribers.Demand)? = nil,
                 receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)? = nil) {
-        self.receiveSubscription = receiveSubscription ?? AnySubscriber.defaultReceiveSubscription
-        self.receiveValue = receiveValue ?? AnySubscriber.defaultReceiveValue
-        self.receiveCompletion = receiveCompletion ?? AnySubscriber.defaultReceiveCompletion
+        self.receiveSubscription = receiveSubscription ?? defaultReceiveSubscription
+        self.receiveValue = receiveValue ?? defaultReceiveValue
+        self.receiveCompletion = receiveCompletion ?? defaultReceiveCompletion
+        combineIdentifier = CombineIdentifier()
     }
 
     public func receive(_ input: Input) -> Subscribers.Demand {
@@ -83,16 +94,16 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
     public var playgroundDescription: Any {
         return description
     }
+}
 
-    private static func defaultReceiveSubscription(_ subscription: Subscription) -> Void {
-        subscription.request(Subscribers.Demand.unlimited)
-    }
+private func defaultReceiveSubscription(_ subscription: Subscription) {
+    subscription.request(Subscribers.Demand.unlimited)
+}
 
-    private static func defaultReceiveValue(_ input: Input) -> Subscribers.Demand {
-        return Subscribers.Demand.unlimited
-    }
+private func defaultReceiveValue<Input>(_ input: Input) -> Subscribers.Demand {
+    return Subscribers.Demand.unlimited
+}
 
-    private static func defaultReceiveCompletion(_ completion: Subscribers.Completion<Failure>) -> Void {
-        // Do nothing.
-    }
+private func defaultReceiveCompletion<Failure>(_ completion: Subscribers.Completion<Failure>) where Failure: Error {
+    // Do nothing.
 }
