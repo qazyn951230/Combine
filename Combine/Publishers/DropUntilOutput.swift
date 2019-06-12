@@ -36,10 +36,6 @@ private final class DropUntilOutputOtherPipe<Other, Origin>: UpstreamPipe, Locki
     }
 
     func receive(subscription: Subscription) {
-        if stop {
-            subscription.cancel()
-            return
-        }
         assert(upstream == nil)
         upstream = subscription
     }
@@ -81,10 +77,6 @@ private final class DropUntilOutputPipe<Other, Downstream>: UpstreamPipe, Lockin
     }
 
     func receive(subscription: Subscription) {
-        if stop {
-            subscription.cancel()
-            return
-        }
         assert(upstream == nil)
         upstream = subscription
         let pipe = DropUntilOutputOtherPipe(self)

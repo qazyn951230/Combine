@@ -35,10 +35,6 @@ extension UpstreamPipe {
     }
 
     func receive(subscription: Subscription) {
-        if stop {
-            subscription.cancel()
-            return
-        }
         assert(upstream == nil)
         upstream = subscription
         downstream.receive(subscription: self)

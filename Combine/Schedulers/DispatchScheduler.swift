@@ -103,7 +103,6 @@ extension DispatchTime: Strideable {
             return Stride(lhs.value * rhs.value)
         }
 
-        // Numeric
         public static func *=(lhs: inout Stride, rhs: Stride) {
             lhs = Stride(lhs.value * rhs.value)
         }

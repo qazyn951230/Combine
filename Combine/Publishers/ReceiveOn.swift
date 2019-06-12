@@ -38,10 +38,6 @@ private final class ReceiveOnPipe<Downstream, Context>: UpstreamPipe
     }
 
     func receive(subscription: Subscription) {
-        if stop {
-            subscription.cancel()
-            return
-        }
         assert(upstream == nil)
         upstream = subscription
         scheduler.schedule(options: options) {

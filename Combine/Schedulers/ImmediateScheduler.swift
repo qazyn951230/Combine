@@ -155,10 +155,6 @@ public struct ImmediateScheduler: Scheduler {
     /// You cannot create instances of the immediate scheduler yourself. Use only the shared instance.
     public static let shared = ImmediateScheduler()
 
-    public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
-        action()
-    }
-
     /// Returns this scheduler's definition of the current moment in time.
     public var now: SchedulerTimeType {
         return SchedulerTimeType()
@@ -167,6 +163,10 @@ public struct ImmediateScheduler: Scheduler {
     /// Returns the minimum tolerance allowed by the scheduler.
     public var minimumTolerance: SchedulerTimeType.Stride {
         return SchedulerTimeType.Stride(0)
+    }
+
+    public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
+        action()
     }
 
     public func schedule(after date: SchedulerTimeType, tolerance: SchedulerTimeType.Stride,

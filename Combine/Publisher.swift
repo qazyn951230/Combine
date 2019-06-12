@@ -480,13 +480,27 @@ public extension Publisher {
     /// - Returns: A publisher that drops elements from the upstream publisher until
     ///         the `other` publisher produces a value.
     func drop<P>(untilOutputFrom publisher: P) -> Publishers.DropUntilOutput<Self, P>
-        where P : Publisher, Self.Failure == P.Failure {
+        where P: Publisher, Self.Failure == P.Failure {
         return Publishers.DropUntilOutput(upstream: self, other: publisher)
     }
 
     // MARK: - Instance Methods
+
     func eraseToAnyPublisher() -> AnyPublisher<Output, Failure> {
         return AnyPublisher(self)
+    }
+
+    /// Attaches a subscriber with closure-based behavior.
+    ///
+    /// This method creates the subscriber and immediately requests an unlimited number of values,
+    ///     prior to returning the subscriber.
+    /// - parameter receiveComplete: The closure to execute on completion.
+    ///         If `nil`, the sink uses an empty closure.
+    /// - parameter receiveValue: The closure to execute on receipt of a value.
+    /// - Returns: A subscriber that performs the provided closures upon receiving values or completion.
+    func sink(receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)? = nil,
+              receiveValue: @escaping ((Output) -> Void)) -> Subscribers.Sink<Self> {
+        return Subscribers.Sink(receiveCompletion: receiveCompletion, receiveValue: receiveValue)
     }
 }
 

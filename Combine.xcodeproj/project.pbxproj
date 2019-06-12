@@ -22,6 +22,7 @@
 		AC96A8532B6A9FD8936D4E57 /* TryContainsWhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */; };
 		AC96A8F705D5B01BD32F1594 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A20EA86D34F2FA09D9BA /* Lock.swift */; };
 		AC96A8FA38FD323536C85BBE /* SchedulerTimeIntervalConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A4872441C4F5D9E8564B /* SchedulerTimeIntervalConvertible.swift */; };
+		AC96A96E509EE7515DBE6855 /* Print.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A58E0FB39D9C1C596F2F /* Print.swift */; };
 		AC96A98283FDED96CACFBE04 /* TryScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A620FA080826E58A410A /* TryScan.swift */; };
 		AC96A9A77F8721380FB04BCF /* DropUntilOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AC7DCC21A7014D9FD9C9 /* DropUntilOutput.swift */; };
 		AC96A9B0FA116E8CBF9BDD37 /* SetFailureType.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AEC54F2AB29B209AC3E3 /* SetFailureType.swift */; };
@@ -103,6 +104,7 @@
 		AC96A27B4B37C85EC62CB5F9 /* TryFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryFilter.swift; sourceTree = "<group>"; };
 		AC96A2D8D62250244C0989DA /* UnfairLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnfairLock.swift; sourceTree = "<group>"; };
 		AC96A4872441C4F5D9E8564B /* SchedulerTimeIntervalConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchedulerTimeIntervalConvertible.swift; sourceTree = "<group>"; };
+		AC96A58E0FB39D9C1C596F2F /* Print.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Print.swift; sourceTree = "<group>"; };
 		AC96A620FA080826E58A410A /* TryScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryScan.swift; sourceTree = "<group>"; };
 		AC96A7A0535961DC9A376D05 /* CollectByTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectByTime.swift; sourceTree = "<group>"; };
 		AC96A8D7AA35C60A7905CFAF /* Filter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Filter.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 				AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */,
 				AC96AA780E35A3B0AD72CECD /* TryAllSatisfy.swift */,
 				AC96AC7DCC21A7014D9FD9C9 /* DropUntilOutput.swift */,
+				AC96A58E0FB39D9C1C596F2F /* Print.swift */,
 			);
 			path = Publishers;
 			sourceTree = "<group>";
@@ -531,6 +534,7 @@
 				AC96AC654874BA6445F4E127 /* DispatchScheduler.swift in Sources */,
 				AC96A1FDD3DEAF36B0BEBBED /* Locking.swift in Sources */,
 				AC96A9FE93AD08CB777F3310 /* Bag.swift in Sources */,
+				AC96A96E509EE7515DBE6855 /* Print.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
