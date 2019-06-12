@@ -27,6 +27,7 @@
 /// Subscriber implementations can use this type to provide a “cancellation token” that
 ///     makes it possible for a caller to cancel a publisher,
 ///     but not to use the `Subscription` object to request items.
+
 public final class AnyCancellable: Cancellable {
     private var _cancel: (() -> Void)?
     private(set) var canceled = false
