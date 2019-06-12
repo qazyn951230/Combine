@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class JustPipe<Downstream>: Pipe where Downstream: Subscriber {
+private final class JustPipe<Downstream>: Pipe, CustomStringConvertible where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
@@ -31,6 +31,10 @@ private final class JustPipe<Downstream>: Pipe where Downstream: Subscriber {
     init(_ downstream: Downstream, _ input: Input) {
         self.downstream = downstream
         self.input = input
+    }
+    
+    var description: String {
+        return "Just"
     }
 
     func request(_ demand: Subscribers.Demand) {

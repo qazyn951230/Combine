@@ -70,4 +70,14 @@ final class CombineTests: XCTestCase {
         }
         foo.subscribe(sink)
     }
+    
+    func testJustPrint() {
+        let foo = Publishers.Just(123)
+            .print()
+            .eraseToAnyPublisher()
+        let sink = Subscribers.Sink<AnyPublisher<Int, Never>> { v in
+            XCTAssertEqual(v, 123)
+        }
+        foo.subscribe(sink)
+    }
 }

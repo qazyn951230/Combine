@@ -27,31 +27,32 @@ private final class PrintPipe<Downstream>: UpstreamPipe where Downstream: Subscr
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let prefix: String
+    let prefix: String?
     let stream: TextOutputStream?
 
     init(_ downstream: Downstream, _ prefix: String, _ stream: TextOutputStream?) {
         self.downstream = downstream
-        self.prefix = prefix
+        self.prefix = prefix.isEmpty ? nil : prefix
         self.stream = stream
     }
 
     func request(_ demand: Subscribers.Demand) {
-
+        write("request: \(demand)")
+        upstream?.request(demand)
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
-        write("value: \(input)")
+        write("receive value: (\(input))")
         return forward(input)
     }
 
     func receive(subscription: Subscription) {
         assert(upstream == nil)
         upstream = subscription
-        write("subscription")
+        write("receive subscription: (\(subscription))")
         downstream.receive(subscription: self)
     }
 
@@ -59,18 +60,30 @@ private final class PrintPipe<Downstream>: UpstreamPipe where Downstream: Subscr
         if stop {
             return
         }
+        switch completion {
+        case let .failure(e):
+            write("receive error: (\(e))")
+        case .finished:
+            write("receive finished")
+        }
         forward(completion: completion)
     }
 
     func clean() {
-        write("cancellation")
+        write("receive cancel")
     }
 
     private func write(_ string: String) {
-        if var _stream = stream {
-            _stream.write(prefix + string)
+        let value: String
+        if let p = prefix {
+            value = "\(p): \(string)"
         } else {
-            print(prefix + string)
+            value = string
+        }
+        if var _stream = stream {
+            _stream.write(value)
+        } else {
+            print(value)
         }
     }
 }
@@ -120,8 +133,9 @@ public extension Publishers {
         ///     - subscriber: The subscriber to attach to this `Publisher`.
         ///                   once attached it can begin to receive values.
         public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
-        Upstream.Output == S.Input {
-
+            Upstream.Output == S.Input {
+                let pipe = PrintPipe(subscriber, prefix, stream)
+                upstream.subscribe(pipe)
         }
     }
 }
