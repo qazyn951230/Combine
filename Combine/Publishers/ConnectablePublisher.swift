@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A publisher that provides an explicit means of connecting and canceling publication.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/connectablepublisher)
 public protocol ConnectablePublisher: Publisher {
     func connect() -> Cancellable

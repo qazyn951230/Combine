@@ -17,6 +17,7 @@
 		AC96A3D7557F5CF59802B040 /* CompactMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */; };
 		AC96A4369F6B1FEC4546E778 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A8D7AA35C60A7905CFAF /* Filter.swift */; };
 		AC96A5BA2E62C23BAA2E21D1 /* TryReduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */; };
+		AC96A7C1183503962D1D6AB1 /* MapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AB7E54BF1B2640684CD7 /* MapTests.swift */; };
 		AC96A7F0528F0C7A46CA5E34 /* Count.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A15A6403BC6D8DC47C9E /* Count.swift */; };
 		AC96A8532B6A9FD8936D4E57 /* TryContainsWhere.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */; };
 		AC96A8F705D5B01BD32F1594 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A20EA86D34F2FA09D9BA /* Lock.swift */; };
@@ -113,6 +114,7 @@
 		AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryReduce.swift; sourceTree = "<group>"; };
 		AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryContainsWhere.swift; sourceTree = "<group>"; };
 		AC96AB3BEB6B54D76B7126BF /* TryCompactMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryCompactMap.swift; sourceTree = "<group>"; };
+		AC96AB7E54BF1B2640684CD7 /* MapTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapTests.swift; sourceTree = "<group>"; };
 		AC96AC7DCC21A7014D9FD9C9 /* DropUntilOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DropUntilOutput.swift; sourceTree = "<group>"; };
 		AC96AD083BDE1640EEB10798 /* Comparison.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparison.swift; sourceTree = "<group>"; };
 		AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompactMap.swift; sourceTree = "<group>"; };
@@ -199,6 +201,14 @@
 			path = Schedulers;
 			sourceTree = "<group>";
 		};
+		AC96AEE514A87C01D76DDCE6 /* Publishers */ = {
+			isa = PBXGroup;
+			children = (
+				AC96AB7E54BF1B2640684CD7 /* MapTests.swift */,
+			);
+			path = Publishers;
+			sourceTree = "<group>";
+		};
 		BC2EB4D922A95386009A0E54 /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
@@ -254,6 +264,7 @@
 			children = (
 				BCD4D72F22A7590A00DE874F /* CombineTests.swift */,
 				BCD4D73122A7590A00DE874F /* Info.plist */,
+				AC96AEE514A87C01D76DDCE6 /* Publishers */,
 			);
 			path = CombineTests;
 			sourceTree = "<group>";
@@ -528,6 +539,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BCD4D73022A7590A00DE874F /* CombineTests.swift in Sources */,
+				AC96A7C1183503962D1D6AB1 /* MapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

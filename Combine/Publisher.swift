@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// Declares that a type can transmit a sequence of values over time.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/publisher)
 public protocol Publisher {
     /// The kind of values published by this publisher.
@@ -56,14 +56,11 @@ public extension Publisher {
         receive(subscriber: subscriber)
     }
 
-    /// Attaches the specified Subscriber to this Publisher.
-    /// - Parameters:
-    ///     - subscriber: The subscriber to attach to this `Publisher`.
-    ///         once attached it can begin to receive values.
     func subscribe<S>(_ subject: S) -> AnyCancellable where S: Subject, Failure == S.Failure, Output == S.Output {
         let subscriber = AnySubscriber(subject)
         receive(subscriber: subscriber)
         return AnyCancellable {
+            subject.send(completion: Subscribers.Completion.finished)
         }
     }
 

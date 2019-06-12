@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A type-erasing publisher.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/anypublisher)
 ///
 /// Use `AnyPublisher` to wrap a publisher whose type has details you don’t want to

@@ -40,7 +40,7 @@ struct BagItem<Item>: Hashable where Item: CustomCombineIdentifierConvertible {
     }
 }
 
-final class Bag<Item>: SetAlgebra where Item: CustomCombineIdentifierConvertible {
+struct Bag<Item>: SetAlgebra where Item: CustomCombineIdentifierConvertible {
     typealias Element = Item
     private(set) var content: Set<BagItem<Item>>
 
@@ -72,32 +72,32 @@ final class Bag<Item>: SetAlgebra where Item: CustomCombineIdentifierConvertible
         return Bag(content: content.symmetricDifference(other.content))
     }
 
-    func insert(_ newMember: Item) -> (inserted: Bool, memberAfterInsert: Item) {
+    mutating func insert(_ newMember: Item) -> (inserted: Bool, memberAfterInsert: Item) {
         let (a, b) = content.insert(BagItem(newMember))
         return (a, b.item)
     }
 
-    func remove(_ member: Item) -> Item? {
+    mutating func remove(_ member: Item) -> Item? {
         return content.remove(BagItem(member))?.item
     }
 
-    func update(with newMember: Item) -> Item? {
+    mutating func update(with newMember: Item) -> Item? {
         return content.update(with: BagItem(newMember))?.item
     }
 
-    func formUnion(_ other: Bag<Item>) {
+    mutating func formUnion(_ other: Bag<Item>) {
         content.formUnion(other.content)
     }
 
-    func formIntersection(_ other: Bag<Item>) {
+    mutating func formIntersection(_ other: Bag<Item>) {
         content.formIntersection(other.content)
     }
 
-    func formSymmetricDifference(_ other: Bag<Item>) {
+    mutating func formSymmetricDifference(_ other: Bag<Item>) {
         content.formSymmetricDifference(other.content)
     }
 
-    func removeAll(keepingCapacity keepCapacity: Bool = false) {
+    mutating func removeAll(keepingCapacity keepCapacity: Bool = false) {
         content.removeAll(keepingCapacity: keepCapacity)
     }
 
@@ -109,18 +109,5 @@ final class Bag<Item>: SetAlgebra where Item: CustomCombineIdentifierConvertible
 
     static func ==(lhs: Bag<Item>, rhs: Bag<Item>) -> Bool {
         return lhs.content == rhs.content
-    }
-}
-
-extension Bag: Cancellable where Item: Subscription {
-    func cancel() {
-        let set = content
-        content.removeAll(keepingCapacity: false)
-        if set.isEmpty {
-            return
-        }
-        set.forEach { item in
-            item.item.cancel()
-        }
     }
 }

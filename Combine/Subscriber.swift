@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A protocol that declares a type that can receive input from a publisher.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/subscriber)
 public protocol Subscriber: CustomCombineIdentifierConvertible {
     /// The kind of values this subscriber receives.
@@ -37,7 +37,7 @@ public protocol Subscriber: CustomCombineIdentifierConvertible {
     /// - Parameters:
     ///   - input: The published element.
     /// - Returns: A Demand instance indicating how many more elements
-    ///     the subcriber expects to receive.
+    ///     the subscriber expects to receive.
     func receive(_ input: Input) -> Subscribers.Demand
 
     // MARK: - Receiving Life Cycle Events

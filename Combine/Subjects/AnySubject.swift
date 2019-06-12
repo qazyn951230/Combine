@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A type-erasing subject.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/anysubject)
 ///
 /// Use AnySubject to wrap a subject whose type has details you don’t want to

@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 /// A scheduler for performing synchronous actions.
+/// - SeeAlso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/immediatescheduler)
 ///
 /// You can only use this scheduler for immediate actions.
 ///     If you attempt to schedule actions after a specific date, the scheduler produces a fatal error.
@@ -153,7 +155,6 @@ public struct ImmediateScheduler: Scheduler {
     /// You cannot create instances of the immediate scheduler yourself. Use only the shared instance.
     public static let shared = ImmediateScheduler()
 
-    /// Performs the action at the next possible opportunity.
     public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
         action()
     }
@@ -168,14 +169,11 @@ public struct ImmediateScheduler: Scheduler {
         return SchedulerTimeType.Stride(0)
     }
 
-    /// Performs the action at some time after the specified date.
     public func schedule(after date: SchedulerTimeType, tolerance: SchedulerTimeType.Stride,
                          options: SchedulerOptions?, _ action: @escaping () -> Void) {
         fatalError()
     }
 
-    /// Performs the action at some time after the specified date, at the specified
-    /// frequency, optionally taking into account tolerance if possible.
     public func schedule(after date: SchedulerTimeType, interval: SchedulerTimeType.Stride,
                          tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
                          _ action: @escaping () -> Void) -> Cancellable {

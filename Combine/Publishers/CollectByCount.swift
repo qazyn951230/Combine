@@ -85,7 +85,7 @@ private final class CollectByCountPipe<Input, Downstream>: UpstreamPipe
 
 public extension Publishers {
     /// A publisher that buffers a maximum number of items.
-    /// - seealso: [The Combine Library Reference]
+    /// - SeeAlso: [The Combine Library Reference]
     ///     (https://developer.apple.com/documentation/combine/publishers/collectbycount)
     struct CollectByCount<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = [Upstream.Output]

@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A protocol representing the connection of a subscriber to a publisher.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/subscription)
 ///
 /// Subcriptions are class constrained because a `Subscription` has identity -

@@ -20,49 +20,171 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//#if canImport(Dispatch)
-//import Dispatch
-//
-//extension DispatchTime: Strideable {
-//    public struct Stride: Comparable, SignedNumeric {
-//        internal var value: UInt64
-//    }
-//
-//    public func advanced(by n: Stride) -> DispatchTime {
-//
-//    }
-//
-//    public func distance(to other: DispatchTime) -> Stride {
-//
-//    }
-//}
+#if canImport(Dispatch)
+import Dispatch
 
-//extension DispatchQueue: Scheduler {
-//    public typealias SchedulerTimeType = DispatchTime
-//    public typealias SchedulerOptions = Never
-//
-//    /// Returns this scheduler's definition of the current moment in time.
-//    var now: SchedulerTimeType {
-//
-//    }
-//
-//    /// Returns the minimum tolerance allowed by the scheduler.
-//    var minimumTolerance: SchedulerTimeType.Stride {
-//
-//    }
-//
-//    /// Performs the action at the next possible opportunity.
-//    func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void)
-//
-//    /// Performs the action at some time after the specified date.
-//    func schedule(after date: SchedulerTimeType, tolerance: SchedulerTimeType.Stride,
-//                  options: SchedulerOptions?, _ action: @escaping () -> Void)
-//
-//    /// Performs the action at some time after the specified date, at the specified
-//    /// frequency, optionally taking into account tolerance if possible.
-//    func schedule(after date: SchedulerTimeType, interval: SchedulerTimeType.Stride,
-//                  tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
-//                  _ action: @escaping () -> Void) -> Cancellable
-//}
+extension DispatchTime: Strideable {
+    public struct Stride: SchedulerTimeIntervalConvertible, Comparable, SignedNumeric {
+        // Numeric
+        public typealias Magnitude = UInt
 
-//#endif
+        // nanoseconds
+        internal let value: Int
+
+        public init(_ value: Int) {
+            self.value = value
+        }
+
+        // Numeric
+        public init?<T>(exactly source: T) where T: BinaryInteger {
+            guard let value = Int(exactly: source) else {
+                return nil
+            }
+            self.value = value
+        }
+
+        public init(integerLiteral value: Int) {
+            self.value = value
+        }
+
+        // Numeric
+        public var magnitude: Magnitude {
+            return value.magnitude
+        }
+
+        var interval: DispatchTimeInterval {
+            return DispatchTimeInterval.nanoseconds(value)
+        }
+
+        public static func microseconds(_ us: Int) -> Stride {
+            return Stride(Int(us) * 1000_000)
+        }
+
+        public static func milliseconds(_ ms: Int) -> Stride {
+            return Stride(Int(ms) * 1000)
+        }
+
+        public static func nanoseconds(_ ns: Int) -> Stride {
+            return Stride(Int(ns))
+        }
+
+        public static func seconds(_ s: Double) -> Stride {
+            return Stride(Int(s * 1000_000_000))
+        }
+
+        public static func seconds(_ s: Int) -> Stride {
+            return Stride(Int(s) * 1000_000_000)
+        }
+
+        // Equatable
+        public static func ==(lhs: Stride, rhs: Stride) -> Bool {
+            return lhs.value == rhs.value
+        }
+
+        // Comparable
+        public static func <(lhs: Stride, rhs: Stride) -> Bool {
+            return lhs.value < rhs.value
+        }
+
+        public static func >(lhs: Stride, rhs: Stride) -> Bool {
+            return lhs.value > rhs.value
+        }
+
+        public static func <=(lhs: Stride, rhs: Stride) -> Bool {
+            return lhs.value <= rhs.value
+        }
+
+        public static func >=(lhs: Stride, rhs: Stride) -> Bool {
+            return lhs.value >= rhs.value
+        }
+
+        // Numeric
+        public static func *(lhs: Stride, rhs: Stride) -> Stride {
+            return Stride(lhs.value * rhs.value)
+        }
+
+        // Numeric
+        public static func *=(lhs: inout Stride, rhs: Stride) {
+            lhs = Stride(lhs.value * rhs.value)
+        }
+
+        // AdditiveArithmetic
+        public static func +(lhs: Stride, rhs: Stride) -> Stride {
+            return Stride(lhs.value + rhs.value)
+        }
+
+        public static func +=(lhs: inout Stride, rhs: Stride) {
+            lhs = Stride(lhs.value + rhs.value)
+        }
+
+        public static func -(lhs: Stride, rhs: Stride) -> Stride {
+            return Stride(lhs.value - rhs.value)
+        }
+
+        public static func -=(lhs: inout Stride, rhs: Stride) {
+            lhs = Stride(lhs.value - rhs.value)
+        }
+    }
+
+    public func advanced(by n: Stride) -> DispatchTime {
+        return DispatchTime(uptimeNanoseconds: uptimeNanoseconds.advanced(by: n.value))
+    }
+
+    public func distance(to other: DispatchTime) -> Stride {
+        return Stride(uptimeNanoseconds.distance(to: other.uptimeNanoseconds))
+    }
+}
+
+extension DispatchQueue: Scheduler {
+    public typealias SchedulerTimeType = DispatchTime
+    public typealias SchedulerOptions = Never
+
+    /// Returns this scheduler's definition of the current moment in time.
+    public var now: SchedulerTimeType {
+        return DispatchTime.now()
+    }
+
+    /// Returns the minimum tolerance allowed by the scheduler.
+    public var minimumTolerance: SchedulerTimeType.Stride {
+        return SchedulerTimeType.Stride(0)
+    }
+
+    public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
+        async {
+            action()
+        }
+    }
+
+    public func schedule(after date: SchedulerTimeType, tolerance: SchedulerTimeType.Stride,
+                         options: SchedulerOptions?, _ action: @escaping () -> Void) {
+        asyncAfter(deadline: date) {
+            action()
+        }
+    }
+
+    public func schedule(after date: SchedulerTimeType, interval: SchedulerTimeType.Stride,
+                         tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
+                         _ action: @escaping () -> Void) -> Cancellable {
+        let source = DispatchSource.makeTimerSource(queue: self)
+        assert(interval.value > 0)
+//        assert(tolerance.value >= 0)
+        source.schedule(deadline: date, repeating: interval.interval, leeway: tolerance.interval)
+        // Is there a retain cycle?
+        // source -> eventHandler -> token -> ref -> source
+        var ref: DispatchSourceTimer? = source
+        let token = AnyCancellable {
+            ref?.cancel()
+            ref = nil
+        }
+        source.setEventHandler(handler: {
+            if token.canceled {
+                return
+            }
+            action()
+        })
+        source.resume()
+        return token
+    }
+}
+
+#endif

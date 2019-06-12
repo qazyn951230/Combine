@@ -23,7 +23,7 @@
 import XCTest
 @testable import Combine
 
-class CombineTests: XCTestCase {
+final class CombineTests: XCTestCase {
     func testJust() {
         let foo = Publishers.Just(123)
         let sink = Subscribers.Sink<Publishers.Just<Int>> { v in

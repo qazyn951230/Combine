@@ -53,7 +53,7 @@ public protocol Scheduler {
                   options: SchedulerOptions?, _ action: @escaping () -> Void)
 
     /// Performs the action at some time after the specified date, at the specified
-    /// frequency, optionally taking into account tolerance if possible.
+    ///     frequency, optionally taking into account tolerance if possible.
     func schedule(after date: SchedulerTimeType, interval: SchedulerTimeType.Stride,
                   tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
                   _ action: @escaping () -> Void) -> Cancellable

@@ -27,14 +27,14 @@ public extension Subscribers {
         public typealias Input = Upstream.Output
         public typealias Failure = Upstream.Failure
 
-        public final let receiveCompletion: (Subscribers.Completion<Upstream.Failure>) -> Void
-        public final let receiveValue: (Upstream.Output) -> Void
+        public let receiveCompletion: (Subscribers.Completion<Upstream.Failure>) -> Void
+        public let receiveValue: (Upstream.Output) -> Void
 
         private var stop = false
 
         public init(receiveCompletion: ((Subscribers.Completion<Upstream.Failure>) -> Void)? = nil,
                     receiveValue: @escaping ((Upstream.Output) -> Void)) {
-            self.receiveCompletion = receiveCompletion ?? Sink.deafultCompletion
+            self.receiveCompletion = receiveCompletion ?? Sink.defaultCompletion
             self.receiveValue = receiveValue
         }
 
@@ -65,7 +65,7 @@ public extension Subscribers {
             stop = true
         }
 
-        private static func deafultCompletion(_ completion: Subscribers.Completion<Upstream.Failure>) {
+        private static func defaultCompletion(_ completion: Subscribers.Completion<Upstream.Failure>) {
             // Do nothing.
         }
     }

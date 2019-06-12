@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 /// A type-erasing subscriber.
-/// - seealso: [The Combine Library Reference]
+/// - SeeAlso: [The Combine Library Reference]
 ///     (https://developer.apple.com/documentation/combine/anysubscriber)
 ///
 /// Use an `AnySubscriber` to wrap an existing subscriber whose details you don’t want to expose.

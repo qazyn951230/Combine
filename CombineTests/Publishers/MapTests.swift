@@ -20,36 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/// A type-erasing cancellable object that executes a provided closure when canceled.
-/// - SeeAlso: [The Combine Library Reference]
-///     (https://developer.apple.com/documentation/combine/anycancellable)
-///
-/// Subscriber implementations can use this type to provide a “cancellation token” that
-///     makes it possible for a caller to cancel a publisher,
-///     but not to use the `Subscription` object to request items.
-public final class AnyCancellable: Cancellable {
-    private var _cancel: (() -> Void)?
-    private(set) var canceled = false
+import XCTest
+@testable import Combine
 
-    /// Initializes the cancellable object with the given cancel-time closure.
-    ///
-    /// - Parameter cancel: A closure that the `cancel()` method executes.
-    public init(_ cancel: @escaping () -> Void) {
-        _cancel = cancel
-    }
+final class MapTests: XCTestCase {
 
-    // TODO: Is it a `convenience` initializer?
-    public convenience init<C>(_ canceller: C) where C: Cancellable {
-        self.init {
-            canceller.cancel()
-        }
-    }
-
-    /// Cancel the activity.
-    public final func cancel() {
-        let method = _cancel
-        _cancel = nil
-        canceled = true
-        method?()
-    }
 }
