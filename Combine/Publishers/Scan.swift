@@ -36,6 +36,10 @@ private final class ScanPipe<Input, Downstream>: UpstreamPipe where Downstream: 
         self.next = next
     }
 
+    var description: String {
+        return "Scan"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

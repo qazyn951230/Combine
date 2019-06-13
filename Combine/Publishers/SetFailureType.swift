@@ -33,6 +33,10 @@ private final class SetFailureTypePipe<Downstream>: UpstreamPipe
         self.downstream = downstream
     }
 
+    var description: String {
+        return "SetFailureType"
+    }
+
     func receive(completion: Subscribers.Completion<Never>) {
         if stop {
             return

@@ -36,6 +36,10 @@ private final class CollectByCountPipe<Input, Downstream>: UpstreamPipe
         result.reserveCapacity(count)
     }
 
+    var description: String {
+        return "CollectByCount"
+    }
+
     func request(_ demand: Subscribers.Demand) {
         if stop {
             return

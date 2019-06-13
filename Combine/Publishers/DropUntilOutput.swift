@@ -35,6 +35,10 @@ private final class DropUntilOutputOtherPipe<Other, Origin>: UpstreamPipe, Locki
         self.downstream = downstream
     }
 
+    var description: String {
+        return "DropUntilOutput"
+    }
+
     func receive(subscription: Subscription) {
         assert(upstream == nil)
         upstream = subscription
@@ -74,6 +78,10 @@ private final class DropUntilOutputPipe<Other, Downstream>: UpstreamPipe, Lockin
     init(_ downstream: Downstream, _ other: Other) {
         self.downstream = downstream
         self.other = other
+    }
+
+    var description: String {
+        return "DropUntilOutput"
     }
 
     func receive(subscription: Subscription) {

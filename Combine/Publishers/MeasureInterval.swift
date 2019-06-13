@@ -20,63 +20,62 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class ReplaceEmptyPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
-    typealias Input = Downstream.Input
+private final class MeasureIntervalPipe<Input, Context, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Context: Scheduler, Downstream.Input == Context.SchedulerTimeType.Stride {
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
-    let input: Input
-    var hasElement = false
+    let scheduler: Context
+    var last: Context.SchedulerTimeType?
 
-    init(_ downstream: Downstream, _ input: Input) {
+    init(_ downstream: Downstream, _ scheduler: Context) {
         self.downstream = downstream
-        self.input = input
+        self.scheduler = scheduler
     }
 
     var description: String {
-        return "ReplaceEmpty"
+        return "MeasureInterval"
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
-        hasElement = true
-        return forward(input)
-    }
-
-    func receive(completion: Subscribers.Completion<Failure>) {
-        switch completion {
-        case .failure:
-            forward(completion: completion)
-        case .finished:
-            if !hasElement {
-                forward(input)
-            }
-            forwardFinished()
+        let now = scheduler.now
+        if stop {
+            return Subscribers.Demand.none
         }
+        if let current = last {
+            let stride = now.distance(to: current)
+            forward(stride)
+        }
+        last = now
+        return Subscribers.Demand.none
     }
 }
 
 public extension Publishers {
-    /// A publisher that replaces an empty stream with a provided element.
-    struct ReplaceEmpty<Upstream>: Publisher where Upstream: Publisher {
-        public typealias Output = Upstream.Output
-        public typealias Failure = Upstream.Failure
 
-        /// The element to deliver when the upstream publisher finishes without delivering any elements.
-        public let output: Upstream.Output
+    /// A publisher that measures and emits the time interval between events received from an upstream publisher.
+    /// - SeeAlso: [The Combine Library Reference]
+    ///     (https://developer.apple.com/documentation/combine/publishers/measureinterval)
+    struct MeasureInterval<Upstream, Context>: Publisher where Upstream: Publisher, Context: Scheduler {
+        public typealias Output = Context.SchedulerTimeType.Stride
+        public typealias Failure = Upstream.Failure
 
         /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
 
-        public init(upstream: Upstream, output: Output) {
+        /// The scheduler on which to deliver elements.
+        public let scheduler: Context
+
+        init(upstream: Upstream, scheduler: Context) {
             self.upstream = upstream
-            self.output = output
+            self.scheduler = scheduler
         }
 
         public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
-            Upstream.Output == S.Input {
-            let pipe = ReplaceEmptyPipe(subscriber, output)
+            S.Input == Context.SchedulerTimeType.Stride {
+            let pipe = MeasureIntervalPipe<Upstream.Output, Context, S>(subscriber, scheduler)
             upstream.subscribe(pipe)
         }
     }

@@ -33,6 +33,10 @@ private final class TryContainsWherePipe<Input, Failure, Downstream>: UpstreamPi
         self.predicate = predicate
     }
 
+    var description: String {
+        return "TryContainsWhere"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

@@ -35,6 +35,10 @@ private final class TryRemoveDuplicatesPipe<Failure, Downstream>: UpstreamPipe
         self.predicate = predicate
     }
 
+    var description: String {
+        return "TryRemoveDuplicates"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

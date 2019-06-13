@@ -34,6 +34,10 @@ private final class ReplaceErrorPipe<Failure, Downstream>: UpstreamPipe
         self.input = input
     }
 
+    var description: String {
+        return "ReplaceError"
+    }
+
     func receive(completion: Subscribers.Completion<Failure>) {
         switch completion {
         case .failure:

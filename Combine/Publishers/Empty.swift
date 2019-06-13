@@ -31,6 +31,10 @@ private final class EmptyPipe<Downstream>: Pipe where Downstream: Subscriber {
         self.downstream = downstream
     }
 
+    var description: String {
+        return "Empty"
+    }
+
     func request(_ demand: Subscribers.Demand) {
         forwardFinished()
     }

@@ -33,6 +33,10 @@ private final class CompactMapPipe<Input, Downstream>: UpstreamPipe where Downst
         self.transform = transform
     }
 
+    var description: String {
+        return "CompactMap"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

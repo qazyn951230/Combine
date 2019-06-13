@@ -316,16 +316,7 @@ public extension Publisher {
     /// - Returns: A publisher that publishes the maximum value received from the upstream publisher,
     ///         after the upstream publisher finishes.
     func max(by areInIncreasingOrder: @escaping (Output, Output) -> Bool) -> Publishers.Comparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.Comparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return areInIncreasingOrder(lhs, rhs)
-            }
-        }
+        return Publishers.Comparison(upstream: self, areInIncreasingOrder: areInIncreasingOrder)
     }
 
     /// Publishes the maximum value received from the upstream publisher,
@@ -340,16 +331,7 @@ public extension Publisher {
     ///         after the upstream publisher finishes.
     func tryMax(by areInIncreasingOrder: @escaping (Output, Output) throws -> Bool)
             -> Publishers.TryComparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.TryComparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return try areInIncreasingOrder(lhs, rhs)
-            }
-        }
+        return Publishers.TryComparison(upstream: self, areInIncreasingOrder: areInIncreasingOrder)
     }
 
     // func min()
@@ -363,16 +345,7 @@ public extension Publisher {
     /// - Returns: A publisher that publishes the minimum value received from the upstream publisher,
     ///         after the upstream publisher finishes.
     func min(by areInIncreasingOrder: @escaping (Output, Output) -> Bool) -> Publishers.Comparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.Comparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return !areInIncreasingOrder(lhs, rhs)
-            }
-        }
+        return Publishers.Comparison(upstream: self, areInIncreasingOrder: areInIncreasingOrder)
     }
 
     /// Publishes the minimum value received from the upstream publisher,
@@ -387,16 +360,7 @@ public extension Publisher {
     ///         after the upstream publisher finishes.
     func tryMin(by areInIncreasingOrder: @escaping (Output, Output) throws -> Bool)
             -> Publishers.TryComparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.TryComparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return !(try areInIncreasingOrder(lhs, rhs))
-            }
-        }
+        return Publishers.TryComparison(upstream: self, areInIncreasingOrder: areInIncreasingOrder)
     }
 
     // MARK: - Applying Matching Criteria to Elements
@@ -484,12 +448,27 @@ public extension Publisher {
         return Publishers.DropUntilOutput(upstream: self, other: publisher)
     }
 
+    // MARK: - Controlling Timing
+
+    /// Measures and emits the time interval between events received from an upstream publisher.
+    ///
+    /// The output type of the returned scheduler is the time interval of the provided scheduler.
+    /// - Parameters:
+    ///   - scheduler: The scheduler on which to deliver elements.
+    ///   - options: Options that customize the delivery of elements.
+    /// - Returns: A publisher that emits elements representing the time interval between the elements it receives.
+    func measureInterval<S>(using scheduler: S, options: S.SchedulerOptions? = nil)
+            -> Publishers.MeasureInterval<Self, S> where S: Scheduler {
+        // TODO: Scheduler options?
+        return Publishers.MeasureInterval(upstream: self, scheduler: scheduler)
+    }
+
     // MARK: - Instance Methods
 
     func eraseToAnyPublisher() -> AnyPublisher<Output, Failure> {
         return AnyPublisher(self)
     }
-    
+
     /// Prints log messages for all publishing events.
     ///
     /// - Parameter prefix: A string with which to prefix all log messages. Defaults to an empty string.
@@ -556,16 +535,7 @@ public extension Publisher where Output: Comparable {
     /// - Returns: A publisher that publishes the maximum value received from the upstream publisher,
     ///         after the upstream publisher finishes.
     func max() -> Publishers.Comparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.Comparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return lhs > rhs
-            }
-        }
+        return Publishers.Comparison(upstream: self, areInIncreasingOrder: <)
     }
 
     /// Publishes the minimum value received from the upstream publisher, after it finishes.
@@ -575,15 +545,6 @@ public extension Publisher where Output: Comparable {
     /// - Returns: A publisher that publishes the minimum value received from the upstream publisher,
     ///         after the upstream publisher finishes.
     func min() -> Publishers.Comparison<Self> {
-        // TODO: Is this right?
-        var send: Bool = false
-        return Publishers.Comparison(upstream: self) { lhs, rhs in
-            if send {
-                return false
-            } else {
-                send = true
-                return lhs < rhs
-            }
-        }
+        return Publishers.Comparison(upstream: self, areInIncreasingOrder: >)
     }
 }

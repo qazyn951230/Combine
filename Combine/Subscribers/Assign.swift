@@ -22,26 +22,31 @@
 
 public extension Subscribers {
 
-    /// A simple subscriber that requests an unlimited number of values upon subscription.
     /// - SeeAlso: [The Combine Library Reference]
-    ///     (https://developer.apple.com/documentation/combine/subscribers/sink)
-    final class Sink<Upstream>: Subscriber, Cancellable where Upstream: Publisher {
-        public typealias Input = Upstream.Output
-        public typealias Failure = Upstream.Failure
+    ///     (https://developer.apple.com/documentation/combine/subscribers/assign)
+    final class Assign<Root, Input> : Subscriber, Cancellable, CustomStringConvertible,
+        CustomReflectable, CustomPlaygroundDisplayConvertible {
+        public typealias Failure = Never
 
-        public let receiveCompletion: (Subscribers.Completion<Upstream.Failure>) -> Void
-        public let receiveValue: (Upstream.Output) -> Void
+        public private(set) var object: Root?
+        public let keyPath: ReferenceWritableKeyPath<Root, Input>
         private var upstream: Subscription?
 
-        public init(receiveCompletion: ((Subscribers.Completion<Upstream.Failure>) -> Void)? = nil,
-                    receiveValue: @escaping ((Upstream.Output) -> Void)) {
-            self.receiveCompletion = receiveCompletion ?? Sink.defaultCompletion
-            self.receiveValue = receiveValue
+        public init(object: Root, keyPath: ReferenceWritableKeyPath<Root, Input>) {
+            self.object = object
+            self.keyPath = keyPath
         }
 
-        public func receive(_ input: Input) -> Subscribers.Demand {
-            receiveValue(input)
-            return Subscribers.Demand.none
+        public var description: String {
+            return "\(object!)"
+        }
+
+        public var customMirror: Mirror {
+            return Mirror(reflecting: object!)
+        }
+
+        public var playgroundDescription: Any {
+            return description
         }
 
         public func receive(subscription: Subscription) {
@@ -52,17 +57,20 @@ public extension Subscribers {
             subscription.request(Subscribers.Demand.unlimited)
         }
 
-        public func receive(completion: Subscribers.Completion<Failure>) {
-            receiveCompletion(completion)
+        public func receive(_ value: Input) -> Subscribers.Demand {
+            if let temp = object {
+                temp[keyPath: keyPath] = value
+            }
+            return Subscribers.Demand.none
+        }
+
+        public func receive(completion: Subscribers.Completion<Never>) {
+            object = nil
         }
 
         public func cancel() {
             upstream?.cancel()
             upstream = nil
-        }
-
-        private static func defaultCompletion(_ completion: Subscribers.Completion<Upstream.Failure>) {
-            // Do nothing.
         }
     }
 }

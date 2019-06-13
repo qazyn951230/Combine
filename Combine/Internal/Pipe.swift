@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-protocol Pipe: AnyObject, Subscriber, Subscription {
+protocol Pipe: AnyObject, Subscriber, Subscription, CustomStringConvertible {
     associatedtype Downstream where Downstream: Subscriber
 
     var stop: Bool { get set }
@@ -42,7 +42,10 @@ extension Pipe {
 
     /// - Parameter subscription: The upstream, see `UpstreamPipe`.
     func receive(subscription: Subscription) {
-        // Do nothing.
+        if stop {
+            return
+        }
+        subscription.request(Subscribers.Demand.unlimited)
     }
 
     @discardableResult

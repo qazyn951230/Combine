@@ -35,6 +35,10 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         self.predicate = predicate
     }
 
+    var description: String {
+        return "AllSatisfy"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

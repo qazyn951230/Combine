@@ -55,18 +55,15 @@ public struct ImmediateScheduler: Scheduler {
         /// The increment by which the immediate scheduler counts time.
         public struct Stride: ExpressibleByFloatLiteral, Comparable, SignedNumeric, Codable,
             SchedulerTimeIntervalConvertible {
+
             public typealias FloatLiteralType = Double
             public typealias IntegerLiteralType = Int
             public typealias Magnitude = Int
 
-            public var magnitude: Int {
-                return Int(value.magnitude)
-            }
-
-            internal let value: Int
+            public let magnitude: Int
 
             public init(_ value: Int) {
-                self.value = value
+                self.magnitude = value
             }
 
             public init(integerLiteral value: Int) {
@@ -85,31 +82,31 @@ public struct ImmediateScheduler: Scheduler {
             }
 
             public static func <(lhs: Stride, rhs: Stride) -> Bool {
-                return lhs.value < rhs.value
+                return lhs.magnitude < rhs.magnitude
             }
 
             public static func *(lhs: Stride, rhs: Stride) -> Stride {
-                return Stride(lhs.value * rhs.value)
+                return Stride(lhs.magnitude * rhs.magnitude)
             }
 
             public static func +(lhs: Stride, rhs: Stride) -> Stride {
-                return Stride(lhs.value + rhs.value)
+                return Stride(lhs.magnitude + rhs.magnitude)
             }
 
             public static func -(lhs: Stride, rhs: Stride) -> Stride {
-                return Stride(lhs.value - rhs.value)
+                return Stride(lhs.magnitude - rhs.magnitude)
             }
 
             public static func -=(lhs: inout Stride, rhs: Stride) {
-                lhs = Stride(lhs.value - rhs.value)
+                lhs = Stride(lhs.magnitude - rhs.magnitude)
             }
 
             public static func *=(lhs: inout Stride, rhs: Stride) {
-                lhs = Stride(lhs.value * rhs.value)
+                lhs = Stride(lhs.magnitude * rhs.magnitude)
             }
 
             public static func +=(lhs: inout Stride, rhs: Stride) {
-                lhs = Stride(lhs.value + rhs.value)
+                lhs = Stride(lhs.magnitude + rhs.magnitude)
             }
 
             public static func seconds(_ s: Int) -> Stride {
@@ -131,20 +128,6 @@ public struct ImmediateScheduler: Scheduler {
             public static func nanoseconds(_ ns: Int) -> Stride {
                 return Stride(0)
             }
-
-//            public init(from decoder: Decoder) throws {
-//                let container = try decoder.singleValueContainer()
-//                value = try container.decode(Int.self)
-//            }
-//
-//            public func encode(to encoder: Encoder) throws {
-//                var container = encoder.singleValueContainer()
-//                try container.encode(value)
-//            }
-//
-//            public static func ==(a: Stride, b: Stride) -> Bool {
-//                return a.value == b.value
-//            }
         }
     }
 
@@ -171,12 +154,12 @@ public struct ImmediateScheduler: Scheduler {
 
     public func schedule(after date: SchedulerTimeType, tolerance: SchedulerTimeType.Stride,
                          options: SchedulerOptions?, _ action: @escaping () -> Void) {
-        fatalError()
+        fatalError("Attempt to schedule something in the future on the immediate scheduler")
     }
 
     public func schedule(after date: SchedulerTimeType, interval: SchedulerTimeType.Stride,
                          tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
                          _ action: @escaping () -> Void) -> Cancellable {
-        fatalError()
+        fatalError("Attempt to schedule something in the future on the immediate scheduler")
     }
 }

@@ -34,6 +34,10 @@ private final class TryFilterPipe<Downstream>: UpstreamPipe where Downstream: Su
         self.isIncluded = isIncluded
     }
 
+    var description: String {
+        return "TryFilter"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

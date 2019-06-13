@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 public extension Subscribers {
+
     /// A requested number of items, sent to a publisher from a subscriber via the subscription.
     /// https://developer.apple.com/documentation/combine/subscribers/demand
     /// - Overview:

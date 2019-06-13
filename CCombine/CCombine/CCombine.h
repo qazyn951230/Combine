@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public extension Subscribers {
+#import <Foundation/Foundation.h>
 
-    /// A signal that a publisher doesn’t produce additional elements, either due to normal completion or an error.
-    /// - SeeAlso: [The Combine Library Reference]
-    ///     (https://developer.apple.com/documentation/combine/subscribers/completion)
-    ///
-    /// - finished: The publisher finished normally.
-    /// - failure: The publisher stopped publishing due to the indicated error.
-    enum Completion<Failure> where Failure: Error {
-        case failure(Failure)
-        case finished
-    }
+//! Project version number for CCombine.
+FOUNDATION_EXPORT double CCombineVersionNumber;
+
+//! Project version string for CCombine.
+FOUNDATION_EXPORT const unsigned char CCombineVersionString[];
+
+NS_ASSUME_NONNULL_BEGIN
+
+NSString *stringAddress(id object)  {
+    return [NSString stringWithFormat:@"%p", (__bridge void *)object];
 }
+
+uint64_t longAddress(id object) {
+    return (uint64_t)((__bridge void *)object);
+}
+
+NS_ASSUME_NONNULL_END
+
+

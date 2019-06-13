@@ -35,6 +35,10 @@ private final class ComparisonPipe<Downstream>: UpstreamPipe where Downstream: S
         self.areInIncreasingOrder = areInIncreasingOrder
     }
 
+    var description: String {
+        return "Comparison"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
@@ -46,7 +50,7 @@ private final class ComparisonPipe<Downstream>: UpstreamPipe where Downstream: S
         } else {
             result = input
         }
-        return Subscribers.Demand.unlimited
+        return Subscribers.Demand.none
     }
 
     func receive(completion: Subscribers.Completion<Failure>) {

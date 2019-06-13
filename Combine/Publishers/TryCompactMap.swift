@@ -32,6 +32,10 @@ private final class TryCompactMapPipe<Input, Failure, Downstream>: UpstreamPipe
         self.transform = transform
     }
 
+    var description: String {
+        return "TryCompactMap"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

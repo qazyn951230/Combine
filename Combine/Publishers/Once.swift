@@ -491,12 +491,8 @@ public extension Publishers.Once where Failure == Never {
         switch result {
         case let .success(value):
             return Publishers.Once(value)
-        case let .failure(error):
-            if let e = error as? E {
-                return Publishers.Once(e)
-            } else {
-                fatalError("\(error)")
-            }
+        case .failure:
+            fatalError("Nop")
         }
     }
 }

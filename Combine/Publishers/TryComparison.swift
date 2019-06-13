@@ -34,6 +34,10 @@ private final class TryComparisonPipe<Failure, Downstream>: UpstreamPipe
         self.areInIncreasingOrder = areInIncreasingOrder
     }
 
+    var description: String {
+        return "TryComparison"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

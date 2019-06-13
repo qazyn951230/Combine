@@ -20,16 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public extension Subscribers {
+final class AnySubscription: Subscription {
+    private let requestDemand: (Subscribers.Demand) -> Void
+    private let _cancel: () -> Void
+    let combineIdentifier: CombineIdentifier
 
-    /// A signal that a publisher doesn’t produce additional elements, either due to normal completion or an error.
-    /// - SeeAlso: [The Combine Library Reference]
-    ///     (https://developer.apple.com/documentation/combine/subscribers/completion)
-    ///
-    /// - finished: The publisher finished normally.
-    /// - failure: The publisher stopped publishing due to the indicated error.
-    enum Completion<Failure> where Failure: Error {
-        case failure(Failure)
-        case finished
+    init<S>(subscription: S) where S: Subscription {
+        requestDemand = { d in
+            subscription.request(d)
+        }
+        _cancel = {
+            subscription.cancel()
+        }
+        combineIdentifier = subscription.combineIdentifier
+    }
+
+    func request(_ demand: Subscribers.Demand) {
+        requestDemand(demand)
+    }
+
+    func cancel() {
+        _cancel()
     }
 }

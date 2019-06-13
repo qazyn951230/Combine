@@ -36,8 +36,12 @@ private final class PrintPipe<Downstream>: UpstreamPipe where Downstream: Subscr
         self.stream = stream
     }
 
+    var description: String {
+        return "Print"
+    }
+
     func request(_ demand: Subscribers.Demand) {
-        write("request: \(demand)")
+        write(demand: demand, sync: false)
         upstream?.request(demand)
     }
 
@@ -46,7 +50,9 @@ private final class PrintPipe<Downstream>: UpstreamPipe where Downstream: Subscr
             return Subscribers.Demand.none
         }
         write("receive value: (\(input))")
-        return forward(input)
+        let demand = forward(input)
+        write(demand: demand, sync: true)
+        return demand
     }
 
     func receive(subscription: Subscription) {
@@ -84,6 +90,26 @@ private final class PrintPipe<Downstream>: UpstreamPipe where Downstream: Subscr
             _stream.write(value)
         } else {
             print(value)
+        }
+    }
+
+    @inline(__always)
+    private func write(demand: Subscribers.Demand, sync: Bool) {
+        switch demand {
+        case let .max(value):
+            if value > 0 {
+                if sync {
+                    write("request: max (\(value)) (synchronous)")
+                } else {
+                    write("request: max(\(value))")
+                }
+            }
+        case .unlimited:
+            if sync {
+                write("request: unlimited (synchronous)")
+            } else {
+                write("request: unlimited")
+            }
         }
     }
 }
@@ -134,8 +160,8 @@ public extension Publishers {
         ///                   once attached it can begin to receive values.
         public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
             Upstream.Output == S.Input {
-                let pipe = PrintPipe(subscriber, prefix, stream)
-                upstream.subscribe(pipe)
+            let pipe = PrintPipe(subscriber, prefix, stream)
+            upstream.subscribe(pipe)
         }
     }
 }

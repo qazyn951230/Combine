@@ -31,6 +31,10 @@ private final class SubscribeOnOnPipe<Downstream>: UpstreamPipe where Downstream
     init(_ downstream: Downstream) {
         self.downstream = downstream
     }
+
+    var description: String {
+        return "SubscribeOn"
+    }
 }
 
 public extension Publishers {

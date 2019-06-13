@@ -31,6 +31,10 @@ private final class IgnoreOutputPipe<Input, Downstream>: UpstreamPipe where Down
         self.downstream = downstream
     }
 
+    var description: String {
+        return "IgnoreOutput"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

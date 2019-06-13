@@ -23,6 +23,7 @@
 protocol UpstreamPipe: Pipe {
     var upstream: Subscription? { get set }
 
+    func request(subscription: Subscription)
     func clean()
 }
 
@@ -38,6 +39,11 @@ extension UpstreamPipe {
         assert(upstream == nil)
         upstream = subscription
         downstream.receive(subscription: self)
+        request(subscription: subscription)
+    }
+
+    func request(subscription: Subscription) {
+        subscription.request(Subscribers.Demand.unlimited)
     }
 
     func clean() {

@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// A namespace for types related to the Subscriber protocol.
+/// - SeeAlso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/subscribers)
 public enum Subscribers {
     // Namespace for Subscribers
 }

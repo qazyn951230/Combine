@@ -31,6 +31,10 @@ private final class AutoconnectPipe<Downstream>: UpstreamPipe where Downstream: 
     init(_ downstream: Downstream) {
         self.downstream = downstream
     }
+
+    var description: String {
+        return "Autoconnect"
+    }
 }
 
 public extension Publishers {

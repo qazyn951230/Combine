@@ -35,6 +35,10 @@ private final class SequencePipe<Elements, Downstream>: Pipe
         self.input = input
     }
 
+    var description: String {
+        return "Sequence"
+    }
+
     func request(_ demand: Subscribers.Demand) {
         if stop {
             return

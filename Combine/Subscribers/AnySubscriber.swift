@@ -27,10 +27,12 @@
 /// Use an `AnySubscriber` to wrap an existing subscriber whose details you don’t want to expose.
 /// You can also use `AnySubscriber` to create a custom subscriber by
 ///     providing closures for `Subscriber`’s methods, rather than implementing `Subscriber` directly.
-public struct AnySubscriber<Input, Failure>: Subscriber,
-    CustomStringConvertible, CustomReflectable, CustomPlaygroundDisplayConvertible
-    where Failure: Error {
+public struct AnySubscriber<Input, Failure>: Subscriber, CustomStringConvertible,
+    CustomReflectable, CustomPlaygroundDisplayConvertible where Failure: Error {
+
     public let combineIdentifier: CombineIdentifier
+    public let description: String
+
     let receiveSubscription: (Subscription) -> Void
     let receiveValue: (Input) -> Subscribers.Demand
     let receiveCompletion: (Subscribers.Completion<Failure>) -> Void
@@ -46,6 +48,7 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
             s.receive(completion: i)
         }
         combineIdentifier = s.combineIdentifier
+        description = "Subscriber"
     }
 
     public init<S>(_ s: S) where Input == S.Output, Failure == S.Failure, S: Subject {
@@ -59,7 +62,9 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
         receiveCompletion = { i in
             s.send(completion: i)
         }
-        combineIdentifier = CombineIdentifier()
+        combineIdentifier = CombineIdentifier(s)
+        // TODO: SubjectSubscriber<Subject>
+        description = "Subject"
     }
 
     public init(receiveSubscription: ((Subscription) -> Void)? = nil,
@@ -69,6 +74,7 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
         self.receiveValue = receiveValue ?? defaultReceiveValue
         self.receiveCompletion = receiveCompletion ?? defaultReceiveCompletion
         combineIdentifier = CombineIdentifier()
+        description = "AnySubscriber"
     }
 
     public func receive(_ input: Input) -> Subscribers.Demand {
@@ -81,10 +87,6 @@ public struct AnySubscriber<Input, Failure>: Subscriber,
 
     public func receive(completion: Subscribers.Completion<Failure>) {
         receiveCompletion(completion)
-    }
-
-    public var description: String {
-        return ""
     }
 
     public var customMirror: Mirror {

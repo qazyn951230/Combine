@@ -20,13 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe, Locking where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
     var upstream: Subscription?
+    let lock = MutexLock(recursive: true)
     let predicate: (Input, Input) -> Bool
     var values: [Input] = []
 
@@ -35,30 +36,32 @@ private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe where Downstr
         self.predicate = predicate
     }
 
+    var description: String {
+        return "RemoveDuplicates"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
         }
-        let contains = values.contains { (value: Input) in
-            self.predicate(input, value)
+        let newly = synchronized { () -> Bool in
+            let contains = self.values.contains { (value: Input) in
+                self.predicate(input, value)
+            }
+            if !contains {
+                self.values.append(input)
+            }
+            return !contains
         }
-        if contains {
+        if newly {
             return forward(input)
+        } else {
+            return Subscribers.Demand.none
         }
-        return Subscribers.Demand.unlimited
     }
 
-    func cancel() {
-        if stop {
-            assert(upstream == nil)
-            assert(values.isEmpty)
-            return
-        }
-        stop = true
-        let up = upstream
-        upstream = nil
+    func clean() {
         values.removeAll(keepingCapacity: false)
-        up?.cancel()
     }
 }
 

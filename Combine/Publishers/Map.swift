@@ -33,6 +33,10 @@ private final class MapPipe<Input, Downstream>: UpstreamPipe where Downstream: S
         self.transform = transform
     }
 
+    var description: String {
+        return "Map"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

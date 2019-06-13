@@ -526,7 +526,8 @@ public extension Publishers.Optional {
     }
 
 
-    func tryReduce<T>(_ initialResult: T, _ nextPartialResult: (T, Output) throws -> T) -> Publishers.Optional<T, Error> {
+    func tryReduce<T>(_ initialResult: T, _ nextPartialResult: (T, Output) throws -> T)
+            -> Publishers.Optional<T, Error> {
         switch result {
         case let .success(value):
             if let output = value {
@@ -593,7 +594,8 @@ public extension Publishers.Optional {
     }
 
 
-    func tryScan<T>(_ initialResult: T, _ nextPartialResult: (T, Output) throws -> T) -> Publishers.Optional<T, Error> {
+    func tryScan<T>(_ initialResult: T, _ nextPartialResult: (T, Output) throws -> T)
+            -> Publishers.Optional<T, Error> {
         switch result {
         case let .success(value):
             if let output = value {
@@ -615,12 +617,9 @@ public extension Publishers.Optional where Failure == Never {
         switch result {
         case let .success(value):
             return Publishers.Optional(value)
-        case let .failure(error):
-            if let e = error as? E {
-                return Publishers.Optional(e)
-            } else {
-                fatalError("\(error)")
-            }
+        case .failure:
+            // Nop
+            return Publishers.Optional(nil)
         }
     }
 }

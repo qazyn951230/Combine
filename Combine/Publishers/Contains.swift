@@ -35,6 +35,10 @@ private final class ContainsPipe<Input, Downstream>: UpstreamPipe
         self.input = input
     }
 
+    var description: String {
+        return "Contains"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

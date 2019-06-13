@@ -20,18 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import CCombine
+
 public struct CombineIdentifier: Hashable, CustomStringConvertible {
+    private let address: UInt64
+
     public init() {
+        address = CombineIdentifier.next()
     }
 
     public init(_ object: AnyObject) {
-
+        address = longAddress(object)
     }
 
     public var description: String {
-        return "CombineIdentifier: \(hashValue)"
+        return String(address, radix: 16)
     }
 
     public func hash(into hasher: inout Hasher) {
+        hasher.combine(address)
+    }
+
+    private static var current: UInt64 = 0
+
+    @inline(__always)
+    private static func next() -> UInt64 {
+        defer {
+            current += 1
+        }
+        return current
     }
 }

@@ -36,6 +36,10 @@ private final class ReducePipe<Input, Downstream>: UpstreamPipe where Downstream
         self.next = next
     }
 
+    var description: String {
+        return "Reduce"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

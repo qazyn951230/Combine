@@ -33,6 +33,10 @@ private final class CollectPipe<Input, Downstream>: UpstreamPipe
         self.downstream = downstream
     }
 
+    var description: String {
+        return "Collect"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none

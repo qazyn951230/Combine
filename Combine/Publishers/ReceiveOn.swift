@@ -37,6 +37,10 @@ private final class ReceiveOnPipe<Downstream, Context>: UpstreamPipe
         self.scheduler = scheduler
     }
 
+    var description: String {
+        return "ReceiveOn"
+    }
+
     func receive(subscription: Subscription) {
         assert(upstream == nil)
         upstream = subscription

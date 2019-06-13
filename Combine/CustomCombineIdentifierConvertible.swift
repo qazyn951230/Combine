@@ -20,11 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// - SeeAlso: [The Combine Library Reference]
+///     (https://developer.apple.com/documentation/combine/customcombineidentifierconvertible)
 public protocol CustomCombineIdentifierConvertible {
     var combineIdentifier: CombineIdentifier { get }
 }
 
-public extension CustomCombineIdentifierConvertible where Self : AnyObject {
+public extension CustomCombineIdentifierConvertible where Self: AnyObject {
     var combineIdentifier: CombineIdentifier {
         return CombineIdentifier(self)
     }

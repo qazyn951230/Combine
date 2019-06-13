@@ -34,6 +34,10 @@ private final class MapErrorPipe<Failure, Downstream>: UpstreamPipe
         self.transform = transform
     }
 
+    var description: String {
+        return "MapError"
+    }
+
     func receive(completion: Subscribers.Completion<Failure>) {
         if stop {
             return

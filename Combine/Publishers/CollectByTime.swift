@@ -50,6 +50,10 @@ private final class CollectByTimePipe<Input, Downstream, Context>: UpstreamPipe
         }
     }
 
+    var description: String {
+        return "CollectByTime"
+    }
+
     @inline(__always)
     func isTimeout() -> Bool {
         let _now = now ?? scheduler.now

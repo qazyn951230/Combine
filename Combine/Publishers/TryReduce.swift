@@ -35,6 +35,10 @@ private final class TryReducePipe<Input, Failure, Downstream>: UpstreamPipe
         self.next = next
     }
 
+    var description: String {
+        return "TryReduce"
+    }
+
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
