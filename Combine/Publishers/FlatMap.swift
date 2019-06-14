@@ -20,71 +20,76 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//private final class FlatMapChild<Upstream, Downstream>: Subscriber, Cancellable
-//    where Downstream: Subscriber, Upstream: Publisher, Upstream.Failure == Downstream.Failure {
-//    typealias Input = Upstream.Output
-//    typealias Failure = Upstream.Failure
-//    typealias Parent = FlatMapChild<Input, Upstream, Downstream>
-//
-//    let parent: Parent
-//    var stop = false
-//
-//    init(_ parent: Parent) {
-//        self.parent = parent
-//    }
-//
-//    func receive(subscription: Subscription) {
-//        if stop {
-//            return
-//        }
-//        return parent.receive(subscription: subscription)
-//    }
-//
-//    func receive(_ input: Input) -> Subscribers.Demand {
-//        if stop {
-//            return Subscribers.Demand.none
-//        }
-//        return parent.receive(input)
-//    }
-//
-//    func receive(completion: Subscribers.Completion<Failure>) {
-//        if stop {
-//            return
-//        }
-//        return parent.receive(completion: completion)
-//    }
-//
-//    func cancel() {
-//        stop = true
-//    }
-//}
-//
-//private final class FlatMapPipe<Input, Output, Downstream>: UpstreamPipe
-//    where Downstream: Subscriber, Output: Publisher, Output.Failure == Downstream.Failure {
-//    typealias Failure = Downstream.Failure
-//
-//    var stop = false
-//    let downstream: Downstream
-//    var upstream: Subscription?
-//    let transform: (Input) -> Output
-//    var count: Int = 0
-//
-//    init(_ downstream: Downstream, _ transform: @escaping (Input) -> Output) {
-//        self.downstream = downstream
-//        self.transform = transform
-//    }
-//
-//    func receive(_ input: Input) -> Subscribers.Demand {
-////        let output = transform(input)
-////        let child = FlatMapChild(self)
-////        output.subscribe(child)
-//        return Subscribers.Demand.unlimited
-//    }
-//}
+private final class FlatMapChildPipe<Pipe, Upstream, Origin>: UpstreamPipe
+    where Upstream: Publisher, Origin: Subscriber, Upstream.Failure == Origin.Failure {
+    typealias Downstream = FlatMapPipe<Pipe, Upstream, Origin>
+    typealias Input = Upstream.Output
+    typealias Failure = Upstream.Failure
+
+    var stop = false
+    let downstream: Downstream
+    var upstream: Subscription?
+
+    init(_ downstream: Downstream) {
+        self.downstream = downstream
+    }
+
+    var description: String {
+        return "FlatMap"
+    }
+
+    // Input -> Upstream.Output -> Inner.Output
+    func receive(_ input: Input) -> Subscribers.Demand {
+        return downstream.receiveChild(input)
+    }
+
+    func receive(completion: Subscribers.Completion<Failure>) {
+        downstream.receiveChild(self, completion: completion)
+    }
+}
+
+private final class FlatMapPipe<Input, Inner, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Inner: Publisher, Inner.Failure == Downstream.Failure {
+    typealias Failure = Downstream.Failure
+    typealias Child = FlatMapChildPipe<Input, Inner, Downstream>
+
+    var stop = false
+    let downstream: Downstream
+    var upstream: Subscription?
+    let transform: (Input) -> Inner
+    var count: Int = 0
+
+    init(_ downstream: Downstream, _ transform: @escaping (Input) -> Inner) {
+        self.downstream = downstream
+        self.transform = transform
+    }
+
+    var description: String {
+        return "FlatMap"
+    }
+
+    func receive(_ input: Input) -> Subscribers.Demand {
+        let output = transform(input)
+        let child = FlatMapChildPipe(self)
+        output.subscribe(child)
+        return Subscribers.Demand.none
+    }
+
+    // Inner -> P
+    // Inner.Output -> P.Output -> Output -> S.Input -> Downstream.Input
+    func receiveChild(_ input: Inner.Output) -> Subscribers.Demand {
+//        forward(input)
+        return Subscribers.Demand.none
+    }
+
+    func receiveChild(_ child: Child, completion: Subscribers.Completion<Inner.Failure>) {
+
+    }
+}
 
 public extension Publishers {
     struct FlatMap<P, Upstream>: Publisher where P: Publisher, Upstream: Publisher, P.Failure == Upstream.Failure {
-        public typealias Output = Upstream.Output
+        public typealias Output = P.Output
         public typealias Failure = Upstream.Failure
 
         public let maxPublishers: Subscribers.Demand
@@ -92,8 +97,12 @@ public extension Publishers {
         public let upstream: Upstream
 
         public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-//            let pipe = FlatMapPipe(subscriber, transform)
-//            upstream.subscribe(pipe)
+            // Input -> Upstream.Output
+            // Inner -> P
+            // Downstream -> S
+            // Failure -> Downstream.Failure -> S.Failure -> Failure -> Upstream.Failure
+            let pipe = FlatMapPipe(subscriber, transform)
+            upstream.subscribe(pipe)
         }
     }
 }

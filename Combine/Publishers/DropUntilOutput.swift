@@ -39,11 +39,6 @@ private final class DropUntilOutputOtherPipe<Other, Origin>: UpstreamPipe, Locki
         return "DropUntilOutput"
     }
 
-    func receive(subscription: Subscription) {
-        assert(upstream == nil)
-        upstream = subscription
-    }
-
     func receive(_ input: Input) -> Subscribers.Demand {
         if stop {
             return Subscribers.Demand.none
@@ -58,7 +53,7 @@ private final class DropUntilOutputOtherPipe<Other, Origin>: UpstreamPipe, Locki
         return Subscribers.Demand.none
     }
 
-    func receive(completion: Subscribers.Completion<Other.Failure>) {
+    func receive(completion: Subscribers.Completion<Failure>) {
         // Do nothing.
     }
 }

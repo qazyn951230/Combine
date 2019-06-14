@@ -52,7 +52,7 @@ private final class AllSatisfyPipe<Input, Downstream>: UpstreamPipe
         case let .failure(e):
             forward(failure: e)
         case .finished:
-            _ = forward(result)
+            forward(result)
             forwardFinished()
         }
     }
