@@ -88,6 +88,7 @@ private final class CollectByCountPipe<Input, Downstream>: UpstreamPipe
 }
 
 public extension Publishers {
+
     /// A publisher that buffers a maximum number of items.
     /// - SeeAlso: [The Combine Library Reference]
     ///     (https://developer.apple.com/documentation/combine/publishers/collectbycount)

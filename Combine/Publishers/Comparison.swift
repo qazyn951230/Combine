@@ -89,7 +89,7 @@ public extension Publishers {
         }
 
         public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
-        Upstream.Output == S.Input {
+            Upstream.Output == S.Input {
             let pipe = ComparisonPipe(subscriber, areInIncreasingOrder)
             upstream.subscribe(pipe)
         }

@@ -20,6 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+private final class FailPipe<Downstream>: Pipe where Downstream: Subscriber {
+    typealias Input = Downstream.Input
+    typealias Failure = Downstream.Failure
+    
+    var stop = true
+    let downstream: Downstream
+    
+    init(_ downstream: Downstream) {
+        self.downstream = downstream
+    }
+    
+    var description: String {
+        return "Fail"
+    }
+}
+
 public extension Publishers {
 
     /// A publisher that immediately terminates with the specified error.
@@ -53,7 +69,9 @@ public extension Publishers {
         ///     - subscriber: The subscriber to attach to this `Publisher`.
         ///                   once attached it can begin to receive values.
         public func receive<S>(subscriber: S) where Output == S.Input, Failure == S.Failure, S: Subscriber {
-            subscriber.receive(failure: error)
+            let pipe = FailPipe(subscriber)
+            subscriber.receive(subscription: pipe)
+            pipe.forward(failure: error)
         }
     }
 }

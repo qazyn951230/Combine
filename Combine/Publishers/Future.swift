@@ -20,46 +20,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class EmptyPipe<Downstream>: Pipe where Downstream: Subscriber {
+private final class FuturePipe<Downstream>: Pipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
+    typealias Parent = Publishers.Future<Input, Failure>
 
     var stop = false
     let downstream: Downstream
+    var result: Result<Input, Failure>?
 
     init(_ downstream: Downstream) {
         self.downstream = downstream
     }
 
     var description: String {
-        return "Empty"
+        return "Future"
     }
 
-    func request(_ demand: Subscribers.Demand) {
-        if demand.many {
+    func fulfill(result: Result<Input, Failure>) {
+        if self.result != nil {
+            return
+        }
+        self.result = result
+        switch result {
+        case let .success(value):
+            forward(value)
             forwardFinished()
+        case let .failure(error):
+            forward(failure: error)
         }
     }
 }
 
 public extension Publishers {
-    struct Empty<Output, Failure>: Publisher where Failure: Error {
-        public let completeImmediately: Bool
 
-        public init(completeImmediately: Bool = true) {
-            self.completeImmediately = completeImmediately
+    /// A publisher that eventually produces one value and then finishes or fails.
+    final class Future<Output, Failure>: Publisher where Failure: Error {
+        private let fulfill: (@escaping (Result<Output, Failure>) -> Void) -> Void
+
+        public init(_ attemptToFulfill: @escaping (@escaping (Result<Output, Failure>) -> Void) -> Void) {
+            self.fulfill = attemptToFulfill
         }
 
-        public init(completeImmediately: Bool = true, outputType: Output.Type, failureType: Failure.Type) {
-            self.completeImmediately = completeImmediately
-        }
-
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = EmptyPipe(subscriber)
+        public func receive<S>(subscriber: S) where Output == S.Input, Failure == S.Failure, S: Subscriber {
+            let pipe = FuturePipe(subscriber)
             subscriber.receive(subscription: pipe)
-            if completeImmediately {
-                pipe.forwardFinished()
-            }
+            fulfill(pipe.fulfill(result:))
         }
     }
 }

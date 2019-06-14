@@ -49,6 +49,7 @@ private final class CompactMapPipe<Input, Downstream>: UpstreamPipe where Downst
 }
 
 public extension Publishers {
+
     /// A publisher that republishes all non-`nil` results of calling a closure with each received element.
     struct CompactMap<Upstream, Output>: Publisher where Upstream: Publisher {
         public typealias Failure = Upstream.Failure

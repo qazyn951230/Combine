@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class OptionalPipe<Downstream>: Pipe, CustomStringConvertible where Downstream: Subscriber {
+private final class OptionalPipe<Downstream>: Pipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
@@ -38,7 +38,6 @@ private final class OptionalPipe<Downstream>: Pipe, CustomStringConvertible wher
     }
 
     func request(_ demand: Subscribers.Demand) {
-        // TODO: forward failure immediately
         assert(demand.many, "Optional should not request `none` element.")
         switch result {
         case let .failure(e):
@@ -48,6 +47,12 @@ private final class OptionalPipe<Downstream>: Pipe, CustomStringConvertible wher
                 forward(value)
             }
             forwardFinished()
+        }
+    }
+    
+    func forward() {
+        if case let .failure(e) = result {
+            forward(failure: e)
         }
     }
 }
@@ -88,6 +93,7 @@ public extension Publishers {
         public func receive<S>(subscriber: S) where Output == S.Input, Failure == S.Failure, S: Subscriber {
             let pipe = OptionalPipe(subscriber, result)
             subscriber.receive(subscription: pipe)
+            pipe.forward()
         }
     }
 }

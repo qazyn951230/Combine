@@ -104,6 +104,7 @@ private final class CollectByTimePipe<Input, Downstream, Context>: UpstreamPipe
 }
 
 public extension Publishers {
+
     /// A strategy for collecting received elements.
     ///
     /// - byTime: Collect and periodically publish items.

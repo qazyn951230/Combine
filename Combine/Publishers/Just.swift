@@ -128,13 +128,31 @@ public extension Publishers.Just {
         return self
     }
 
-    // func prepend(_ elements: Output...) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure>
+    func prepend(_ elements: Output...) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure> {
+        var temp = elements
+        temp.append(output)
+        return Publishers.Sequence(sequence: temp)
+    }
+    
+    func prepend<S>(_ elements: S) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure>
+        where Output == S.Element, S : Sequence {
+        var temp = Array(elements)
+        temp.append(output)
+        return Publishers.Sequence(sequence: temp)
+    }
 
-    // func prepend<S>(_ elements: S) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure> where Output == S.Element, S : Sequence
+    func append(_ elements: Output...) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure> {
+        var temp = elements
+        temp.insert(output, at: temp.startIndex)
+        return Publishers.Sequence(sequence: temp)
+    }
 
-    // func append(_ elements: Output...) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure>
-
-    // func append<S>(_ elements: S) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure> where Output == S.Element, S : Sequence
+    func append<S>(_ elements: S) -> Publishers.Sequence<[Output], Publishers.Just<Output>.Failure>
+        where Output == S.Element, S : Sequence {
+        var temp = Array(elements)
+        temp.insert(output, at: temp.startIndex)
+        return Publishers.Sequence(sequence: temp)
+    }
 
     func contains(where predicate: (Output) -> Bool) -> Publishers.Just<Bool> {
         return Publishers.Just(predicate(output))

@@ -30,7 +30,9 @@
 
 public final class AnyCancellable: Cancellable {
     private var _cancel: (() -> Void)?
-    private(set) var canceled = false
+    var canceled: Bool {
+        return _cancel == nil
+    }
 
     /// Initializes the cancellable object with the given cancel-time closure.
     ///
@@ -50,7 +52,6 @@ public final class AnyCancellable: Cancellable {
     public final func cancel() {
         let method = _cancel
         _cancel = nil
-        canceled = true
         method?()
     }
 }

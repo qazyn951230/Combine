@@ -20,46 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class EmptyPipe<Downstream>: Pipe where Downstream: Subscriber {
-    typealias Input = Downstream.Input
-    typealias Failure = Downstream.Failure
-
-    var stop = false
-    let downstream: Downstream
-
-    init(_ downstream: Downstream) {
-        self.downstream = downstream
-    }
-
-    var description: String {
-        return "Empty"
-    }
-
-    func request(_ demand: Subscribers.Demand) {
-        if demand.many {
-            forwardFinished()
-        }
-    }
-}
-
 public extension Publishers {
-    struct Empty<Output, Failure>: Publisher where Failure: Error {
-        public let completeImmediately: Bool
 
-        public init(completeImmediately: Bool = true) {
-            self.completeImmediately = completeImmediately
+    /// A publisher that awaits subscription before running the supplied closure to
+    ///     create a publisher for the new subscriber.
+    struct Deferred<DeferredPublisher>: Publisher where DeferredPublisher: Publisher {
+        public typealias Output = DeferredPublisher.Output
+        public typealias Failure = DeferredPublisher.Failure
+
+        /// The closure to execute when it receives a subscription.
+        ///
+        /// The publisher returned by this closure immediately receives the incoming subscription.
+        public let createPublisher: () -> DeferredPublisher
+
+        /// Creates a deferred publisher.
+        ///
+        /// - Parameter createPublisher: The closure to execute when calling `subscribe(_:)`.
+        public init(createPublisher: @escaping () -> DeferredPublisher) {
+            self.createPublisher = createPublisher
         }
 
-        public init(completeImmediately: Bool = true, outputType: Output.Type, failureType: Failure.Type) {
-            self.completeImmediately = completeImmediately
-        }
-
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = EmptyPipe(subscriber)
-            subscriber.receive(subscription: pipe)
-            if completeImmediately {
-                pipe.forwardFinished()
-            }
+        public func receive<S>(subscriber: S) where S: Subscriber, DeferredPublisher.Failure == S.Failure,
+        DeferredPublisher.Output == S.Input {
+            let next = createPublisher()
+            next.subscribe(subscriber)
         }
     }
 }
+

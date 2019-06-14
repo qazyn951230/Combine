@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class OncePipe<Downstream>: Pipe, CustomStringConvertible where Downstream: Subscriber {
+private final class OncePipe<Downstream>: Pipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
@@ -38,19 +38,25 @@ private final class OncePipe<Downstream>: Pipe, CustomStringConvertible where Do
     }
 
     func request(_ demand: Subscribers.Demand) {
-        assert(demand.many, "Once should not request `none` element.")
-        // TODO: forward failure immediately
         switch result {
         case let .failure(e):
             forward(failure: e)
         case let .success(v):
+            assert(demand.many, "Once should not request `none` element.")
             forward(v)
             forwardFinished()
+        }
+    }
+    
+    func forward() {
+        if case let .failure(e) = result {
+            forward(failure: e)
         }
     }
 }
 
 public extension Publishers {
+
     /// A publisher that publishes an output to each subscriber exactly once then finishes,
     //      or fails immediately without producing any elements.
     ///
@@ -92,6 +98,7 @@ public extension Publishers {
         public func receive<S>(subscriber: S) where Output == S.Input, Failure == S.Failure, S: Subscriber {
             let pipe = OncePipe(subscriber, result)
             subscriber.receive(subscription: pipe)
+            pipe.forward()
         }
     }
 }

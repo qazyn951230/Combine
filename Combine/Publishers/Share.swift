@@ -20,46 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class EmptyPipe<Downstream>: Pipe where Downstream: Subscriber {
+private final class SharePipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
+    var upstream: Subscription?
 
     init(_ downstream: Downstream) {
         self.downstream = downstream
     }
 
     var description: String {
-        return "Empty"
-    }
-
-    func request(_ demand: Subscribers.Demand) {
-        if demand.many {
-            forwardFinished()
-        }
+        return "Share"
     }
 }
 
 public extension Publishers {
-    struct Empty<Output, Failure>: Publisher where Failure: Error {
-        public let completeImmediately: Bool
 
-        public init(completeImmediately: Bool = true) {
-            self.completeImmediately = completeImmediately
+    /// A publisher implemented as a class, which otherwise behaves like its upstream publisher.
+    final class Share<Upstream>: Publisher, Equatable where Upstream: Publisher {
+        public typealias Output = Upstream.Output
+        public typealias Failure = Upstream.Failure
+
+        let upstream: Upstream
+
+        init(upstream: Upstream) {
+            self.upstream = upstream
         }
 
-        public init(completeImmediately: Bool = true, outputType: Output.Type, failureType: Failure.Type) {
-            self.completeImmediately = completeImmediately
+        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
+            Upstream.Output == S.Input {
+            let pipe = SharePipe(subscriber)
+            upstream.subscribe(pipe)
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = EmptyPipe(subscriber)
-            subscriber.receive(subscription: pipe)
-            if completeImmediately {
-                pipe.forwardFinished()
+        public static func ==(lhs: Publishers.Share<Upstream>, rhs: Publishers.Share<Upstream>) -> Bool {
+            if let left = lhs.upstream as? CustomCombineIdentifierConvertible,
+               let right = rhs.upstream as? CustomCombineIdentifierConvertible {
+                return left.combineIdentifier == right.combineIdentifier
             }
+            return lhs === rhs
         }
     }
 }
