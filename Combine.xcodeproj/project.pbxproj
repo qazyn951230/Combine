@@ -20,6 +20,7 @@
 		AC96A4369F6B1FEC4546E778 /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A8D7AA35C60A7905CFAF /* Filter.swift */; };
 		AC96A461A8F040CD4206EDE8 /* Assign.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96ABFED93BCEC431CA0A26 /* Assign.swift */; };
 		AC96A5BA2E62C23BAA2E21D1 /* TryReduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */; };
+		AC96A646567666D12F0910FB /* CombineLatest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A611B19B4D95FC0A6D70 /* CombineLatest.swift */; };
 		AC96A6D74390B2BEABF8FCBC /* Optional.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96ADD4FD236849CD57C035 /* Optional.swift */; };
 		AC96A7C1183503962D1D6AB1 /* MapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AB7E54BF1B2640684CD7 /* MapTests.swift */; };
 		AC96A7F0528F0C7A46CA5E34 /* Count.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A15A6403BC6D8DC47C9E /* Count.swift */; };
@@ -118,6 +119,7 @@
 		AC96A4872441C4F5D9E8564B /* SchedulerTimeIntervalConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SchedulerTimeIntervalConvertible.swift; sourceTree = "<group>"; };
 		AC96A4F55B76E120E2E6738E /* MeasureInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeasureInterval.swift; sourceTree = "<group>"; };
 		AC96A58E0FB39D9C1C596F2F /* Print.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Print.swift; sourceTree = "<group>"; };
+		AC96A611B19B4D95FC0A6D70 /* CombineLatest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CombineLatest.swift; sourceTree = "<group>"; };
 		AC96A620FA080826E58A410A /* TryScan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TryScan.swift; sourceTree = "<group>"; };
 		AC96A7A0535961DC9A376D05 /* CollectByTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectByTime.swift; sourceTree = "<group>"; };
 		AC96A7D9BF1A346A95C28F33 /* Once.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Once.swift; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 				AC96A25C45A960EAB01A8996 /* TryRemoveDuplicates.swift */,
 				AC96A620FA080826E58A410A /* TryScan.swift */,
 				AC96A0F6FD00829D0CA98864 /* Share.swift */,
+				AC96A611B19B4D95FC0A6D70 /* CombineLatest.swift */,
 			);
 			path = Publishers;
 			sourceTree = "<group>";
@@ -583,6 +586,7 @@
 				AC96A95B1D4AC697419E2543 /* AnySubscription.swift in Sources */,
 				AC96A3A8A2EED76981143F23 /* MeasureInterval.swift in Sources */,
 				AC96AD15B489864E1BF0DAE0 /* Share.swift in Sources */,
+				AC96A646567666D12F0910FB /* CombineLatest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

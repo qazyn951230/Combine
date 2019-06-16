@@ -26,13 +26,13 @@ import Dispatch
 extension DispatchTime: Strideable {
     public struct Stride: SchedulerTimeIntervalConvertible, Comparable, SignedNumeric {
         // Numeric
-        public typealias Magnitude = UInt
+        public typealias Magnitude = Int
 
-        // nanoseconds
-        internal let value: Int
+        // Numeric nanoseconds
+        public let magnitude: Int
 
         public init(_ value: Int) {
-            self.value = value
+            self.magnitude = value
         }
 
         // Numeric
@@ -40,20 +40,15 @@ extension DispatchTime: Strideable {
             guard let value = Int(exactly: source) else {
                 return nil
             }
-            self.value = value
+            self.magnitude = value
         }
 
         public init(integerLiteral value: Int) {
-            self.value = value
-        }
-
-        // Numeric
-        public var magnitude: Magnitude {
-            return value.magnitude
+            self.magnitude = value
         }
 
         var interval: DispatchTimeInterval {
-            return DispatchTimeInterval.nanoseconds(value)
+            return DispatchTimeInterval.nanoseconds(magnitude)
         }
 
         public static func microseconds(_ us: Int) -> Stride {
@@ -78,55 +73,55 @@ extension DispatchTime: Strideable {
 
         // Equatable
         public static func ==(lhs: Stride, rhs: Stride) -> Bool {
-            return lhs.value == rhs.value
+            return lhs.magnitude == rhs.magnitude
         }
 
         // Comparable
         public static func <(lhs: Stride, rhs: Stride) -> Bool {
-            return lhs.value < rhs.value
+            return lhs.magnitude < rhs.magnitude
         }
 
         public static func >(lhs: Stride, rhs: Stride) -> Bool {
-            return lhs.value > rhs.value
+            return lhs.magnitude > rhs.magnitude
         }
 
         public static func <=(lhs: Stride, rhs: Stride) -> Bool {
-            return lhs.value <= rhs.value
+            return lhs.magnitude <= rhs.magnitude
         }
 
         public static func >=(lhs: Stride, rhs: Stride) -> Bool {
-            return lhs.value >= rhs.value
+            return lhs.magnitude >= rhs.magnitude
         }
 
         // Numeric
         public static func *(lhs: Stride, rhs: Stride) -> Stride {
-            return Stride(lhs.value * rhs.value)
+            return Stride(lhs.magnitude * rhs.magnitude)
         }
 
         public static func *=(lhs: inout Stride, rhs: Stride) {
-            lhs = Stride(lhs.value * rhs.value)
+            lhs = Stride(lhs.magnitude * rhs.magnitude)
         }
 
         // AdditiveArithmetic
         public static func +(lhs: Stride, rhs: Stride) -> Stride {
-            return Stride(lhs.value + rhs.value)
+            return Stride(lhs.magnitude + rhs.magnitude)
         }
 
         public static func +=(lhs: inout Stride, rhs: Stride) {
-            lhs = Stride(lhs.value + rhs.value)
+            lhs = Stride(lhs.magnitude + rhs.magnitude)
         }
 
         public static func -(lhs: Stride, rhs: Stride) -> Stride {
-            return Stride(lhs.value - rhs.value)
+            return Stride(lhs.magnitude - rhs.magnitude)
         }
 
         public static func -=(lhs: inout Stride, rhs: Stride) {
-            lhs = Stride(lhs.value - rhs.value)
+            lhs = Stride(lhs.magnitude - rhs.magnitude)
         }
     }
 
     public func advanced(by n: Stride) -> DispatchTime {
-        return DispatchTime(uptimeNanoseconds: uptimeNanoseconds.advanced(by: n.value))
+        return DispatchTime(uptimeNanoseconds: uptimeNanoseconds.advanced(by: n.magnitude))
     }
 
     public func distance(to other: DispatchTime) -> Stride {
@@ -165,7 +160,7 @@ extension DispatchQueue: Scheduler {
                          tolerance: SchedulerTimeType.Stride, options: SchedulerOptions?,
                          _ action: @escaping () -> Void) -> Cancellable {
         let source = DispatchSource.makeTimerSource(queue: self)
-        assert(interval.value > 0)
+        assert(interval.magnitude > 0)
 //        assert(tolerance.value >= 0)
         source.schedule(deadline: date, repeating: interval.interval, leeway: tolerance.interval)
         // Is there a retain cycle?

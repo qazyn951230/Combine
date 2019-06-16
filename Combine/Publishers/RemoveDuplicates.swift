@@ -28,8 +28,8 @@ private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe, Locking wher
     let downstream: Downstream
     var upstream: Subscription?
     let lock = MutexLock(recursive: true)
+    var last: Input?
     let predicate: (Input, Input) -> Bool
-    var values: [Input] = []
 
     init(_ downstream: Downstream, _ predicate: @escaping (Input, Input) -> Bool) {
         self.downstream = downstream
@@ -45,13 +45,12 @@ private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe, Locking wher
             return Subscribers.Demand.none
         }
         let newly = synchronized { () -> Bool in
-            let contains = self.values.contains { (value: Input) in
-                self.predicate(input, value)
+            if let temp = last {
+                return predicate(temp, input)
+            } else {
+                last = input
+                return true
             }
-            if !contains {
-                self.values.append(input)
-            }
-            return !contains
         }
         if newly {
             return forward(input)
@@ -61,7 +60,7 @@ private final class RemoveDuplicatesPipe<Downstream>: UpstreamPipe, Locking wher
     }
 
     func clean() {
-        values.removeAll(keepingCapacity: false)
+        last = nil
     }
 }
 

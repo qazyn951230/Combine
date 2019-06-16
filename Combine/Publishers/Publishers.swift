@@ -23,3 +23,20 @@
 public enum Publishers {
     // Namespace for Publishers
 }
+
+internal extension Publisher {
+    func weakSink<T>(target: T,
+                 _ receiveValue: @escaping (T) -> ((Output) -> Void),
+                 _ receiveCompletion: @escaping (T) -> (Subscribers.Completion<Failure>) -> Void)
+            -> Subscribers.Sink<Self> where T: AnyObject {
+        return Subscribers.Sink(receiveCompletion: { [weak target] i in
+            if let temp = target {
+                receiveCompletion(temp)(i)
+            }
+        }, receiveValue: { [weak target] v in
+            if let temp = target {
+                receiveValue(temp)(v)
+            }
+        })
+    }
+}
