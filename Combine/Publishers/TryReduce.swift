@@ -46,11 +46,8 @@ private final class TryReducePipe<Input, Failure, Downstream>: UpstreamPipe
         do {
             result = try next(result, input)
             return Subscribers.Demand.unlimited
-        } catch let failure as Failure {
-            forward(failure: failure)
-        } catch let e {
-            print(e)
-            cancel()
+        } catch let error {
+            forward(failure: error)
         }
         return Subscribers.Demand.none
     }

@@ -19,8 +19,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-private final class TryMapConnection<Input, Downstream>: UpstreamPipe where Downstream: Subscriber {
-    typealias Failure = Downstream.Failure
+
+private final class TryMapConnection<Input, Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Failure: Error, Downstream.Failure == Error {
 
     var stop = false
     var downstream: Downstream
@@ -42,25 +43,31 @@ private final class TryMapConnection<Input, Downstream>: UpstreamPipe where Down
         }
         do {
             return forward(try transform(input))
-        } catch let failure as Failure {
-            forward(failure: failure)
-        } catch let e {
-            print(e)
-            cancel()
+        } catch let error {
+            forward(failure: error)
         }
         return Subscribers.Demand.none
+    }
+
+    func receive(completion: Subscribers.Completion<Failure>) {
+        switch completion {
+        case let .failure(error):
+            forward(failure: error)
+        case .finished:
+            forwardFinished()
+        }
     }
 }
 
 public extension Publishers {
     struct TryMap<Upstream, Output>: Publisher where Upstream: Publisher {
-        public typealias Failure = Upstream.Failure
+        public typealias Failure = Error
 
         public let transform: (Upstream.Output) throws -> Output
         public let upstream: Upstream
 
         public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = TryMapConnection(transform, subscriber)
+            let pipe = TryMapConnection<Upstream.Output, Upstream.Failure, S>(transform, subscriber)
             upstream.subscribe(pipe)
         }
     }

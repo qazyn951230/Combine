@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class TryScanPipe<Input, Downstream>: UpstreamPipe where Downstream: Subscriber {
-    typealias Failure = Downstream.Failure
+private final class TryScanPipe<Input, Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Downstream.Failure == Error, Failure: Error {
 
     var stop = false
     let downstream: Downstream
@@ -47,19 +47,25 @@ private final class TryScanPipe<Input, Downstream>: UpstreamPipe where Downstrea
         do {
             result = try next(result, input)
             return forward(result)
-        } catch let failure as Failure {
+        } catch let failure {
             forward(failure: failure)
-        } catch let e {
-            print(e)
-            cancel()
         }
         return Subscribers.Demand.none
+    }
+
+    func receive(completion: Subscribers.Completion<Failure>) {
+        switch completion {
+        case let .failure(error):
+            forward(failure: error)
+        case .finished:
+            forwardFinished()
+        }
     }
 }
 
 public extension Publishers {
     struct TryScan<Upstream, Output>: Publisher where Upstream: Publisher {
-        public typealias Failure = Upstream.Failure
+        public typealias Failure = Error
 
         public let initialResult: Output
         public let nextPartialResult: (Output, Upstream.Output) throws -> Output
@@ -71,8 +77,8 @@ public extension Publishers {
             self.upstream = upstream
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            let pipe = TryScanPipe(subscriber, initialResult, nextPartialResult)
+        public func receive<S>(subscriber: S) where Output == S.Input, S : Subscriber, S.Failure == Failure {
+            let pipe = TryScanPipe<Upstream.Output, Upstream.Failure, S>(subscriber, initialResult, nextPartialResult)
             upstream.subscribe(pipe)
         }
     }

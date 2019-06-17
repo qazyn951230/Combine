@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class TryFilterPipe<Downstream>: UpstreamPipe where Downstream: Subscriber {
+private final class TryFilterPipe<Failure, Downstream>: UpstreamPipe
+    where Downstream: Subscriber, Failure: Error, Downstream.Failure == Error {
     typealias Input = Downstream.Input
-    typealias Failure = Downstream.Failure
 
     var stop = false
     let downstream: Downstream
@@ -46,13 +46,19 @@ private final class TryFilterPipe<Downstream>: UpstreamPipe where Downstream: Su
             if try isIncluded(input) {
                 return forward(input)
             }
-        } catch let failure as Failure {
-            forward(failure: failure)
-        } catch let e {
-            print(e)
-            cancel()
+        } catch let error {
+            forward(failure: error)
         }
         return Subscribers.Demand.none
+    }
+
+    func receive(completion: Subscribers.Completion<Failure>) {
+        switch completion {
+        case let .failure(error):
+            forward(failure: error)
+        case .finished:
+            forwardFinished()
+        }
     }
 }
 
@@ -60,7 +66,7 @@ public extension Publishers {
     /// A publisher that republishes all elements that match a provided error-throwing closure.
     struct TryFilter<Upstream>: Publisher where Upstream: Publisher {
         public typealias Output = Upstream.Output
-        public typealias Failure = Upstream.Failure
+        public typealias Failure = Error
 
         /// The publisher from which this publisher receives elements.
         public let upstream: Upstream
@@ -73,9 +79,9 @@ public extension Publishers {
             self.isIncluded = isIncluded
         }
 
-        public func receive<S>(subscriber: S) where S: Subscriber, Upstream.Failure == S.Failure,
-        Upstream.Output == S.Input {
-            let pipe = TryFilterPipe(subscriber, isIncluded)
+        public func receive<S>(subscriber: S)
+            where S : Subscriber, Upstream.Output == S.Input, S.Failure == Failure {
+            let pipe = TryFilterPipe<Upstream.Failure, S>(subscriber, isIncluded)
             upstream.subscribe(pipe)
         }
     }

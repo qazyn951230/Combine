@@ -448,6 +448,153 @@ public extension Publisher {
         return Publishers.DropUntilOutput(upstream: self, other: publisher)
     }
 
+    // MARK: - Combining Elements from Multiple Publishers
+
+    /// Subscribes to an additional publisher and invokes a closure upon receiving output from either publisher.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - other: Another publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///     returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this and another publisher.
+    func combineLatest<P, T>(_ other: P, _ transform: @escaping (Output, P.Output) -> T)
+            -> Publishers.CombineLatest<Self, P, T> where P : Publisher, Failure == P.Failure {
+        return Publishers.CombineLatest(a: self, b: other, transform: transform)
+    }
+
+    /// Subscribes to two additional publishers and invokes a closure upon
+    ///     receiving output from any of the publishers.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - publisher1: A second publisher to combine with this one.
+    ///   - publisher2: A third publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///     returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this publisher and two other publishers.
+    func combineLatest<P, Q, T>(_ publisher1: P, _ publisher2: Q,
+                                _ transform: @escaping (Output, P.Output, Q.Output) -> T)
+            -> Publishers.CombineLatest3<Self, P, Q, T>
+        where P : Publisher, Q : Publisher, Failure == P.Failure, P.Failure == Q.Failure {
+        return Publishers.CombineLatest3(a: self, b: publisher1, c: publisher2, transform: transform)
+    }
+
+    /// Subscribes to three additional publishers and invokes a closure upon
+    ///     receiving output from any of the publishers.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - publisher1: A second publisher to combine with this one.
+    ///   - publisher2: A third publisher to combine with this one.
+    ///   - publisher3: A fourth publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///     returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this publisher and three other publishers.
+    func combineLatest<P, Q, R, T>(_ publisher1: P, _ publisher2: Q, _ publisher3: R,
+                                   _ transform: @escaping (Output, P.Output, Q.Output, R.Output) -> T)
+            -> Publishers.CombineLatest4<Self, P, Q, R, T> where P : Publisher, Q : Publisher, R : Publisher,
+            Failure == P.Failure, P.Failure == Q.Failure, Q.Failure == R.Failure {
+        return Publishers.CombineLatest4(a: self, b: publisher1, c: publisher2, d: publisher3, transform: transform)
+    }
+
+    /// Subscribes to an additional publisher and invokes an error-throwing closure upon
+    ///     receiving output from either publisher.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// If the provided transform throws an error, the publisher fails with the error.
+    ///     `Self.Failure` and `P.Failure` must both be `Swift.Error`.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - other: Another publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///         returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this and another publisher.
+    func tryCombineLatest<P, T>(_ other: P, _ transform: @escaping (Output, P.Output) throws -> T)
+            -> Publishers.TryCombineLatest<Self, P, T> where P : Publisher, P.Failure == Error {
+        return Publishers.TryCombineLatest(a: self, b: other, transform: transform)
+    }
+
+    /// Subscribes to two additional publishers and invokes an error-throwing closure upon
+    ///     receiving output from any of the publishers.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// If the provided transform throws an error, the publisher fails with the error.
+    ///     `Self.Failure` and `P.Failure` must both be `Swift.Error`.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - publisher1: A second publisher to combine with this one.
+    ///   - publisher2: A third publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///         returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this publisher and two other publishers.
+    func tryCombineLatest<P, Q, T>(_ publisher1: P, _ publisher2: Q,
+                                   _ transform: @escaping (Output, P.Output, Q.Output) throws -> T)
+            -> Publishers.TryCombineLatest3<Self, P, Q, T>
+        where P : Publisher, Q : Publisher, P.Failure == Error, Q.Failure == Error {
+        return Publishers.TryCombineLatest3(a: self, b: publisher1, c: publisher2, transform: transform)
+    }
+
+    /// Subscribes to three additional publishers and invokes an error-throwing closure upon
+    ///     receiving output from any of the publishers.
+    ///
+    /// The combined publisher passes through any requests to *all* upstream publishers.
+    ///     However, it still obeys the demand-fulfilling rule of only sending the request amount downstream.
+    ///     If the demand isn’t `.unlimited`, it drops values from upstream publishers.
+    ///     It implements this by using a buffer size of 1 for each upstream,
+    ///     and holds the most recent value in each buffer.
+    /// If the provided transform throws an error, the publisher fails with the error.
+    ///     `Self.Failure` and `P.Failure` must both be `Swift.Error`.
+    /// All upstream publishers need to finish for this publisher to finish.
+    ///     If an upstream publisher never publishes a value, this publisher never finishes.
+    /// If any of the combined publishers terminates with a failure, this publisher also fails.
+    /// - Parameters:
+    ///   - publisher1: A second publisher to combine with this one.
+    ///   - publisher2: A third publisher to combine with this one.
+    ///   - publisher3: A fourth publisher to combine with this one.
+    ///   - transform: A closure that receives the most recent value from each publisher and
+    ///         returns a new value to publish.
+    /// - Returns: A publisher that receives and combines elements from this publisher and three other publishers.
+    func tryCombineLatest<P, Q, R, T>(_ publisher1: P, _ publisher2: Q, _ publisher3: R,
+                                      _ transform: @escaping (Output, P.Output, Q.Output, R.Output) throws -> T)
+            -> Publishers.TryCombineLatest4<Self, P, Q, R, T>
+        where P : Publisher, Q : Publisher, R : Publisher, P.Failure == Error, Q.Failure == Error, R.Failure == Error {
+        return Publishers.TryCombineLatest4(a: self, b: publisher1, c: publisher2, d: publisher3, transform: transform)
+    }
+
     // MARK: - Controlling Timing
 
     /// Measures and emits the time interval between events received from an upstream publisher.

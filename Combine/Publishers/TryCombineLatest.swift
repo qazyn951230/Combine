@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-private final class CombineLatestChildPipe<Input, Downstream>: UpstreamPipe, Locking
+private final class TryCombineLatestChildPipe<Input, Downstream>: UpstreamPipe, Locking
     where Downstream: Subscriber {
 
     typealias Failure = Downstream.Failure
@@ -41,7 +41,7 @@ private final class CombineLatestChildPipe<Input, Downstream>: UpstreamPipe, Loc
     }
 
     var description: String {
-        return "CombineLatest"
+        return "TryCombineLatest"
     }
 
     func receive(_ input: Input) -> Subscribers.Demand {
@@ -58,7 +58,7 @@ private final class CombineLatestChildPipe<Input, Downstream>: UpstreamPipe, Loc
     }
 }
 
-private class CombineLatestPipe<Downstream>: UpstreamPipe, Locking where Downstream: Subscriber {
+private class TryCombineLatestPipe<Downstream>: UpstreamPipe, Locking where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
@@ -79,7 +79,7 @@ private class CombineLatestPipe<Downstream>: UpstreamPipe, Locking where Downstr
     }
 
     var description: String {
-        return "CombineLatest"
+        return "TryCombineLatest"
     }
 
     func receiveInput(index: Int) -> Bool {
@@ -109,28 +109,28 @@ private class CombineLatestPipe<Downstream>: UpstreamPipe, Locking where Downstr
     }
 }
 
-private final class CombineLatestPipe2<A, B, Downstream>: CombineLatestPipe<Downstream>
-    where Downstream: Subscriber, A: Publisher, B: Publisher, A.Failure == Downstream.Failure,
-    A.Failure == B.Failure {
+private final class TryCombineLatestPipe2<A, B, Downstream>: TryCombineLatestPipe<Downstream>
+    where Downstream: Subscriber, A: Publisher, B: Publisher, Downstream.Failure == Error,
+    A.Failure == Error, B.Failure == Error {
 
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
-    let transform: (A.Output, B.Output) -> Input
+    let transform: (A.Output, B.Output) throws -> Input
     var lastA: A.Output?
     var lastB: B.Output?
 
-    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output) -> Input) {
+    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output) throws -> Input) {
         self.transform = transform
         super.init(downstream, 2)
     }
 
     func forward(a: A, b: B) {
-        let aChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let aChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(a:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 0, completion)
         }
-        let bChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let bChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(b:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 1, completion)
         }
@@ -158,38 +158,43 @@ private final class CombineLatestPipe2<A, B, Downstream>: CombineLatestPipe<Down
             return
         }
         if let a = lastA, let b = lastB {
-            forward(transform(a, b))
+            do {
+                let result = try transform(a, b)
+                forward(result)
+            } catch let error {
+                forward(failure: error)
+            }
         }
     }
 }
 
-private final class CombineLatestPipe3<A, B, C, Downstream>: CombineLatestPipe<Downstream>
-    where Downstream: Subscriber, A: Publisher, B: Publisher, C: Publisher, A.Failure == Downstream.Failure,
-    A.Failure == B.Failure, A.Failure == C.Failure {
+private final class TryCombineLatestPipe3<A, B, C, Downstream>: TryCombineLatestPipe<Downstream>
+    where Downstream: Subscriber, A: Publisher, B: Publisher, C: Publisher, Downstream.Failure == Error,
+    A.Failure == Error, B.Failure == Error, C.Failure == Error {
 
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
-    let transform: (A.Output, B.Output, C.Output) -> Input
+    let transform: (A.Output, B.Output, C.Output) throws -> Input
     var lastA: A.Output?
     var lastB: B.Output?
     var lastC: C.Output?
 
-    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output, C.Output) -> Input) {
+    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output, C.Output) throws -> Input) {
         self.transform = transform
         super.init(downstream, 3)
     }
 
     func forward(a: A, b: B, c: C) {
-        let aChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let aChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(a:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 0, completion)
         }
-        let bChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let bChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(b:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 1, completion)
         }
-        let cChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let cChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(c:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 2, completion)
         }
@@ -224,43 +229,48 @@ private final class CombineLatestPipe3<A, B, C, Downstream>: CombineLatestPipe<D
             return
         }
         if let a = lastA, let b = lastB, let c = lastC {
-            forward(transform(a, b, c))
+            do {
+                let result = try transform(a, b, c)
+                forward(result)
+            } catch let error {
+                forward(failure: error)
+            }
         }
     }
 }
 
-private final class CombineLatestPipe4<A, B, C, D, Downstream>: CombineLatestPipe<Downstream>
-    where Downstream: Subscriber, A: Publisher, B: Publisher, C: Publisher, D: Publisher,
-    A.Failure == Downstream.Failure, A.Failure == B.Failure, A.Failure == C.Failure, A.Failure == D.Failure {
+private final class TryCombineLatestPipe4<A, B, C, D, Downstream>: TryCombineLatestPipe<Downstream>
+    where Downstream: Subscriber, A: Publisher, B: Publisher, C: Publisher, D: Publisher, Downstream.Failure == Error,
+    A.Failure == Error, B.Failure == Error, C.Failure == Error, D.Failure == Error {
 
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
-    let transform: (A.Output, B.Output, C.Output, D.Output) -> Input
+    let transform: (A.Output, B.Output, C.Output, D.Output) throws -> Input
     var lastA: A.Output?
     var lastB: B.Output?
     var lastC: C.Output?
     var lastD: D.Output?
 
-    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output, C.Output, D.Output) -> Input) {
+    init(_ downstream: Downstream, _ transform: @escaping (A.Output, B.Output, C.Output, D.Output) throws -> Input) {
         self.transform = transform
         super.init(downstream, 4)
     }
 
     func forward(a: A, b: B, c: C, d: D) {
-        let aChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let aChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(a:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 0, completion)
         }
-        let bChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let bChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(b:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 1, completion)
         }
-        let cChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let cChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(c:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 2, completion)
         }
-        let dChild = CombineLatestChildPipe(downstream: self, lock: lock,
+        let dChild = TryCombineLatestChildPipe(downstream: self, lock: lock,
             receiveValue: receive(d:)) { (completion: Subscribers.Completion<Failure>) in
             self.receiveCompletion(index: 3, completion)
         }
@@ -302,7 +312,12 @@ private final class CombineLatestPipe4<A, B, C, D, Downstream>: CombineLatestPip
             return
         }
         if let a = lastA, let b = lastB, let c = lastC, let d = lastD {
-            forward(transform(a, b, c, d))
+            do {
+                let result = try transform(a, b, c, d)
+                forward(result)
+            } catch let error {
+                forward(failure: error)
+            }
         }
     }
 }
@@ -310,37 +325,39 @@ private final class CombineLatestPipe4<A, B, C, D, Downstream>: CombineLatestPip
 public extension Publishers {
 
     /// A publisher that receives and combines the latest elements from two publishers.
-    struct CombineLatest<A, B, Output>: Publisher where A: Publisher, B: Publisher, A.Failure == B.Failure {
-        public typealias Failure = A.Failure
+    struct TryCombineLatest<A, B, Output>: Publisher where A: Publisher, B: Publisher,
+    A.Failure == Error, B.Failure == Error {
+
+        public typealias Failure = Error
 
         public let a: A
         public let b: B
-        public let transform: (A.Output, B.Output) -> Output
+        public let transform: (A.Output, B.Output) throws -> Output
 
-        init(a: A, b: B, transform: @escaping (A.Output, B.Output) -> Output) {
+        init(a: A, b: B, transform: @escaping (A.Output, B.Output) throws -> Output) {
             self.a = a
             self.b = b
             self.transform = transform
         }
 
         public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, B.Failure == S.Failure {
-            let pipe = CombineLatestPipe2<A, B, S>(subscriber, transform)
+            let pipe = TryCombineLatestPipe2<A, B, S>(subscriber, transform)
             pipe.forward(a: a, b: b)
         }
     }
 
     /// A publisher that receives and combines the latest elements from three publishers.
-    struct CombineLatest3<A, B, C, Output>: Publisher
-        where A: Publisher, B: Publisher, C: Publisher, A.Failure == B.Failure, B.Failure == C.Failure {
+    struct TryCombineLatest3<A, B, C, Output>: Publisher
+        where A: Publisher, B: Publisher, C: Publisher, A.Failure == Error, B.Failure == Error, C.Failure == Error {
 
-        public typealias Failure = A.Failure
+        public typealias Failure = Error
 
         public let a: A
         public let b: B
         public let c: C
-        public let transform: (A.Output, B.Output, C.Output) -> Output
+        public let transform: (A.Output, B.Output, C.Output) throws -> Output
 
-        init(a: A, b: B, c: C, transform: @escaping (A.Output, B.Output, C.Output) -> Output) {
+        init(a: A, b: B, c: C, transform: @escaping (A.Output, B.Output, C.Output) throws -> Output) {
             self.a = a
             self.b = b
             self.c = c
@@ -348,25 +365,25 @@ public extension Publishers {
         }
 
         public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, C.Failure == S.Failure {
-            let pipe = CombineLatestPipe3<A, B, C, S>(subscriber, transform)
+            let pipe = TryCombineLatestPipe3<A, B, C, S>(subscriber, transform)
             pipe.forward(a: a, b: b, c: c)
         }
     }
 
     /// A publisher that receives and combines the latest elements from four publishers.
-    struct CombineLatest4<A, B, C, D, Output>: Publisher
+    struct TryCombineLatest4<A, B, C, D, Output>: Publisher
         where A: Publisher, B: Publisher, C: Publisher, D: Publisher,
-        A.Failure == B.Failure, B.Failure == C.Failure, C.Failure == D.Failure {
+        A.Failure == Error, B.Failure == Error, C.Failure == Error, D.Failure == Error {
 
-        public typealias Failure = A.Failure
+        public typealias Failure = Error
 
         public let a: A
         public let b: B
         public let c: C
         public let d: D
-        public let transform: (A.Output, B.Output, C.Output, D.Output) -> Output
+        public let transform: (A.Output, B.Output, C.Output, D.Output) throws -> Output
 
-        init(a: A, b: B, c: C, d: D, transform: @escaping (A.Output, B.Output, C.Output, D.Output) -> Output) {
+        init(a: A, b: B, c: C, d: D, transform: @escaping (A.Output, B.Output, C.Output, D.Output) throws -> Output) {
             self.a = a
             self.b = b
             self.c = c
@@ -375,7 +392,7 @@ public extension Publishers {
         }
 
         public func receive<S>(subscriber: S) where Output == S.Input, S: Subscriber, D.Failure == S.Failure {
-            let pipe = CombineLatestPipe4<A, B, C, D, S>(subscriber, transform)
+            let pipe = TryCombineLatestPipe4<A, B, C, D, S>(subscriber, transform)
             pipe.forward(a: a, b: b, c: c, d: d)
         }
     }
