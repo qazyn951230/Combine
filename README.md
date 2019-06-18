@@ -4,6 +4,10 @@ A basic implementation of Apple's Combine framework.
 
 Most operators have been implemented (may with errors).
 
+**NOTICE:**
+
+**Currently compiling on macOS 10.15 beta 2 will fail.**
+
 Publisher Operators implementation:
 
 - [x] receiveOn
