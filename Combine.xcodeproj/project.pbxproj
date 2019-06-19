@@ -50,6 +50,7 @@
 		AC96AF0B1A7BB91D91E4520E /* TryComparison.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96AE042BE4DF37808206CA /* TryComparison.swift */; };
 		AC96AF8426EA0F21F93F4416 /* Once.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A7D9BF1A346A95C28F33 /* Once.swift */; };
 		AC96AFCE3298CE0D85E57187 /* TryCombineLatest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC96A5B6FC6DDCAC12A039C6 /* TryCombineLatest.swift */; };
+		BC0A4A2822BA0536008113C9 /* Combine.h in Headers */ = {isa = PBXBuildFile; fileRef = BC0A4A2622BA0536008113C9 /* Combine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BC2EB4D822A94E48009A0E54 /* MapError.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4D722A94E48009A0E54 /* MapError.swift */; };
 		BC2EB4DB22A9539B009A0E54 /* Subscriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */; };
 		BC2EB4DD22AD48A1009A0E54 /* Scan.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC2EB4DC22AD48A1009A0E54 /* Scan.swift */; };
@@ -58,7 +59,6 @@
 		BCB7D21A22B1EA8A00A7CC91 /* CCombine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCB7D21922B1EA8A00A7CC91 /* CCombine.framework */; };
 		BCD4D72B22A7590A00DE874F /* Combine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCD4D72122A7590A00DE874F /* Combine.framework */; };
 		BCD4D73022A7590A00DE874F /* CombineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D72F22A7590A00DE874F /* CombineTests.swift */; };
-		BCD4D73222A7590A00DE874F /* Combine.h in Headers */ = {isa = PBXBuildFile; fileRef = BCD4D72422A7590A00DE874F /* Combine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BCD4D73C22A7591C00DE874F /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D73B22A7591C00DE874F /* Publisher.swift */; };
 		BCD4D73E22A7592500DE874F /* Subscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D73D22A7592500DE874F /* Subscriber.swift */; };
 		BCD4D74022A759B300DE874F /* AnyPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD4D73F22A759B300DE874F /* AnyPublisher.swift */; };
@@ -149,6 +149,8 @@
 		AC96AFB525B116034F0D3266 /* RemoveDuplicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveDuplicates.swift; sourceTree = "<group>"; };
 		AC96AFC7CDF5610BB06264AB /* ReplaceError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceError.swift; sourceTree = "<group>"; };
 		AC96AFE8282BB17223703859 /* ReplaceEmpty.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReplaceEmpty.swift; sourceTree = "<group>"; };
+		BC0A4A2622BA0536008113C9 /* Combine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Combine.h; sourceTree = "<group>"; };
+		BC0A4A2722BA0536008113C9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BC2EB4D722A94E48009A0E54 /* MapError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapError.swift; sourceTree = "<group>"; };
 		BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscriptions.swift; sourceTree = "<group>"; };
 		BC2EB4DC22AD48A1009A0E54 /* Scan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scan.swift; sourceTree = "<group>"; };
@@ -236,11 +238,36 @@
 			path = Publishers;
 			sourceTree = "<group>";
 		};
+		BC0A4A1022BA00B6008113C9 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BC0A4A2622BA0536008113C9 /* Combine.h */,
+				BC0A4A2722BA0536008113C9 /* Info.plist */,
+				BCD4D74122A75A1300DE874F /* AnyCancellable.swift */,
+				BCD4D75422A761FB00DE874F /* Cancellable.swift */,
+				BCD4D75F22A7708E00DE874F /* CombineIdentifier.swift */,
+				BCD4D75D22A7707700DE874F /* CustomCombineIdentifierConvertible.swift */,
+				BCD4D73B22A7591C00DE874F /* Publisher.swift */,
+				BCEAFBBE22A8F7EA00ABF36B /* Scheduler.swift */,
+				BCD4D74722A75B4600DE874F /* Subject.swift */,
+				BCD4D73D22A7592500DE874F /* Subscriber.swift */,
+				BCD4D75B22A76FF300DE874F /* Subscription.swift */,
+				BCD4D76B22A7A22D00DE874F /* Internal */,
+				BCD4D74B22A75D0300DE874F /* Publishers */,
+				AC96A0C472C24B583AB75701 /* Schedulers */,
+				BCED60C822A8B24600CE5277 /* Subjects */,
+				BCD4D75822A7661800DE874F /* Subscribers */,
+				BC2EB4D922A95386009A0E54 /* Subscription */,
+			);
+			name = Sources;
+			path = Sources/Combine;
+			sourceTree = "<group>";
+		};
 		BC2EB4D922A95386009A0E54 /* Subscription */ = {
 			isa = PBXGroup;
 			children = (
-				BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */,
 				AC96AF629FA6C4C6D3ABBBD3 /* AnySubscription.swift */,
+				BC2EB4DA22A9539B009A0E54 /* Subscriptions.swift */,
 			);
 			path = Subscription;
 			sourceTree = "<group>";
@@ -256,6 +283,7 @@
 		BCD4D71722A7590A00DE874F = {
 			isa = PBXGroup;
 			children = (
+				BC0A4A1022BA00B6008113C9 /* Sources */,
 				BCD4D72322A7590A00DE874F /* Combine */,
 				BCD4D72E22A7590A00DE874F /* CombineTests */,
 				BCD4D72222A7590A00DE874F /* Products */,
@@ -277,21 +305,6 @@
 			children = (
 				BCD4D72422A7590A00DE874F /* Combine.h */,
 				BCD4D72522A7590A00DE874F /* Info.plist */,
-				BCD4D74122A75A1300DE874F /* AnyCancellable.swift */,
-				BCD4D75422A761FB00DE874F /* Cancellable.swift */,
-				BCD4D75F22A7708E00DE874F /* CombineIdentifier.swift */,
-				BCD4D75D22A7707700DE874F /* CustomCombineIdentifierConvertible.swift */,
-				BCD4D73B22A7591C00DE874F /* Publisher.swift */,
-				BCEAFBBE22A8F7EA00ABF36B /* Scheduler.swift */,
-				BCD4D74722A75B4600DE874F /* Subject.swift */,
-				BCD4D73D22A7592500DE874F /* Subscriber.swift */,
-				BCD4D75B22A76FF300DE874F /* Subscription.swift */,
-				BCD4D76B22A7A22D00DE874F /* Internal */,
-				BCD4D74B22A75D0300DE874F /* Publishers */,
-				BCED60C822A8B24600CE5277 /* Subjects */,
-				BCD4D75822A7661800DE874F /* Subscribers */,
-				BC2EB4D922A95386009A0E54 /* Subscription */,
-				AC96A0C472C24B583AB75701 /* Schedulers */,
 			);
 			path = Combine;
 			sourceTree = "<group>";
@@ -315,6 +328,7 @@
 				BCED60D522A8C07800CE5277 /* Collect.swift */,
 				BCED60D722A8C1EE00CE5277 /* CollectByCount.swift */,
 				AC96A7A0535961DC9A376D05 /* CollectByTime.swift */,
+				AC96A611B19B4D95FC0A6D70 /* CombineLatest.swift */,
 				AC96AD3D7C6794DE621A71D9 /* CompactMap.swift */,
 				AC96AD083BDE1640EEB10798 /* Comparison.swift */,
 				BCD4D75022A75EF200DE874F /* Concatenate.swift */,
@@ -346,8 +360,10 @@
 				BC2EB4DC22AD48A1009A0E54 /* Scan.swift */,
 				BCD4D74E22A75E1B00DE874F /* Sequence.swift */,
 				AC96AEC54F2AB29B209AC3E3 /* SetFailureType.swift */,
+				AC96A0F6FD00829D0CA98864 /* Share.swift */,
 				BCEAFBB922A8F7B900ABF36B /* SubscribeOn.swift */,
 				AC96AA780E35A3B0AD72CECD /* TryAllSatisfy.swift */,
+				AC96A5B6FC6DDCAC12A039C6 /* TryCombineLatest.swift */,
 				AC96AB3BEB6B54D76B7126BF /* TryCompactMap.swift */,
 				AC96AE042BE4DF37808206CA /* TryComparison.swift */,
 				AC96AAF4096921C2B002B45E /* TryContainsWhere.swift */,
@@ -356,9 +372,6 @@
 				AC96AA80EA6E76EF5E873C4B /* TryReduce.swift */,
 				AC96A25C45A960EAB01A8996 /* TryRemoveDuplicates.swift */,
 				AC96A620FA080826E58A410A /* TryScan.swift */,
-				AC96A0F6FD00829D0CA98864 /* Share.swift */,
-				AC96A611B19B4D95FC0A6D70 /* CombineLatest.swift */,
-				AC96A5B6FC6DDCAC12A039C6 /* TryCombineLatest.swift */,
 			);
 			path = Publishers;
 			sourceTree = "<group>";
@@ -367,11 +380,11 @@
 			isa = PBXGroup;
 			children = (
 				BCD4D74522A75A7000DE874F /* AnySubscriber.swift */,
+				AC96ABFED93BCEC431CA0A26 /* Assign.swift */,
 				BCD4D76122A7726A00DE874F /* Completion.swift */,
 				BCD4D75922A7662300DE874F /* Demand.swift */,
 				BCD4D76322A772F900DE874F /* Sink.swift */,
 				BCD4D74322A75A4E00DE874F /* Subscribers.swift */,
-				AC96ABFED93BCEC431CA0A26 /* Assign.swift */,
 			);
 			path = Subscribers;
 			sourceTree = "<group>";
@@ -407,7 +420,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCD4D73222A7590A00DE874F /* Combine.h in Headers */,
+				BC0A4A2822BA0536008113C9 /* Combine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -747,7 +760,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = Combine/Info.plist;
+				INFOPLIST_FILE = Sources/Combine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -776,7 +789,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = Combine/Info.plist;
+				INFOPLIST_FILE = Sources/Combine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

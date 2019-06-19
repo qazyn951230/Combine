@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import typealias Darwin.sys.pthread_mutex_t
+import Darwin
 
 final class MutexLock: Lock {
     private let mutex: UnsafeMutablePointer<pthread_mutex_t>

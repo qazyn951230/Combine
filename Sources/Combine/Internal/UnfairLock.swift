@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import typealias Darwin.os.os_unfair_lock_t
+import Darwin
 
 @available(iOS 10.0, OSX 10.12, *)
 final class UnfairLock: Lock {
