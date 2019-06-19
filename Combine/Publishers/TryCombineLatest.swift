@@ -58,7 +58,7 @@ private final class TryCombineLatestChildPipe<Input, Downstream>: UpstreamPipe, 
     }
 }
 
-private class TryCombineLatestPipe<Downstream>: UpstreamPipe, Locking where Downstream: Subscriber {
+private class TryCombineLatestPipe<Downstream>: Pipe, Locking where Downstream: Subscriber {
     typealias Input = Downstream.Input
     typealias Failure = Downstream.Failure
 
@@ -82,6 +82,20 @@ private class TryCombineLatestPipe<Downstream>: UpstreamPipe, Locking where Down
         return "TryCombineLatest"
     }
 
+    func request(_ demand: Subscribers.Demand) {
+        if stop {
+            return
+        }
+        upstream?.request(demand)
+    }
+
+    func receive(subscription: Subscription) {
+        assert(upstream == nil)
+        upstream = subscription
+        downstream.receive(subscription: self)
+        subscription.request(Subscribers.Demand.unlimited)
+    }
+
     func receiveInput(index: Int) -> Bool {
         if !receiveInput[index] {
             receiveInput[index] = true
@@ -101,6 +115,18 @@ private class TryCombineLatestPipe<Downstream>: UpstreamPipe, Locking where Down
                 forwardFinished()
             }
         }
+    }
+
+    func cancel() {
+        if stop {
+            assert(upstream == nil)
+            return
+        }
+        stop = true
+        let up = upstream
+        upstream = nil
+        up?.cancel()
+        clean()
     }
 
     func clean() {

@@ -34,7 +34,7 @@ public struct CombineIdentifier: Hashable, CustomStringConvertible {
     }
 
     public var description: String {
-        return String(address, radix: 16)
+        return "0x" + String(address, radix: 16)
     }
 
     public func hash(into hasher: inout Hasher) {
