@@ -20,16 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+protocol Pipe: SourcePipe, Subscriber {
+    func forward(_ input: Downstream.Input) -> Subscribers.Demand
+    func forward(completion: Subscribers.Completion<Downstream.Failure>)
+}
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
+extension Pipe {
+    @inline(__always)
+    func forward(_ input: Downstream.Input) -> Subscribers.Demand {
+        return downstream.receive(input)
+    }
 
-        /// The publisher finished normally.
-        case finished
-
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
+    @inline(__always)
+    func forward(completion: Subscribers.Completion<Downstream.Failure>) {
+        downstream.receive(completion: completion)
     }
 }

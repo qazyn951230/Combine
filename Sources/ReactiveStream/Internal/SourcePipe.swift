@@ -20,16 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+protocol SourcePipe: AnyObject, Subscription, CustomStringConvertible {
+    associatedtype Downstream where Downstream: Subscriber
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
-
-        /// The publisher finished normally.
-        case finished
-
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
-    }
+    var demand: Subscribers.Demand { get set }
+    var downstream: Downstream { get }
 }

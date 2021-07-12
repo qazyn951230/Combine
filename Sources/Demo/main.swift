@@ -20,16 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+import Combine
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
+@available(macOS 10.15, *)
+func main() {
+    print(Just(1))
+}
 
-        /// The publisher finished normally.
-        case finished
-
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
-    }
+if #available(macOS 10.15, *) {
+    main()
 }

@@ -34,7 +34,8 @@ extension Subscribers {
         }
 
         @inline(__always)
-        private init(_ value: UInt) {
+        @usableFromInline
+        init(_ value: UInt) {
             rawValue = min(UInt(Int.max) + 1, value)
         }
 
@@ -55,7 +56,7 @@ extension Subscribers {
         @inlinable
         public static func max(_ value: Int) -> Demand {
             precondition(value >= 0, "demand cannot be negative")
-            return Demand(value: UInt(value))
+            return Demand(UInt(value))
         }
 
         public var description: String {
@@ -65,161 +66,291 @@ extension Subscribers {
         /// Returns the result of adding two demands.
         /// When adding any value to `.unlimited`, the result is `.unlimited`.
         @inlinable
-        public static func +(lhs: Demand, rhs: Demand) -> Demand
+        public static func +(lhs: Demand, rhs: Demand) -> Demand {
+            if lhs == .unlimited || rhs == .unlimited {
+                return .unlimited
+            }
+            let (value, overflow) = Int(lhs.rawValue).addingReportingOverflow(Int(rhs.rawValue))
+            return overflow ? .unlimited : Demand(rawValue: UInt(value))
+        }
 
         /// Adds two demands, and assigns the result to the first demand.
         ///
         /// When adding any value to `.unlimited`, the result is `.unlimited`.
         @inlinable
-        public static func +=(lhs: inout Demand, rhs: Demand)
+        public static func +=(lhs: inout Demand, rhs: Demand) {
+            lhs = lhs == .unlimited ? lhs : lhs + rhs
+        }
 
         /// Returns the result of adding an integer to a demand.
         ///
         /// When adding any value to `.unlimited`, the result is `.unlimited`.
         @inlinable
-        public static func +(lhs: Demand, rhs: Int) -> Demand
+        public static func +(lhs: Demand, rhs: Int) -> Demand {
+            if lhs == .unlimited {
+                return .unlimited
+            }
+            let (value, overflow) = Int(lhs.rawValue).addingReportingOverflow(rhs)
+            return overflow ? .unlimited : Demand(rawValue: UInt(value))
+        }
 
         /// Adds an integer to a demand, and assigns the result to the demand.
         ///
         /// When adding any value to `.unlimited`, the result is `.unlimited`.
         @inlinable
-        public static func +=(lhs: inout Demand, rhs: Int)
+        public static func +=(lhs: inout Demand, rhs: Int) {
+            lhs = lhs + rhs
+        }
 
         /// Returns the result of multiplying a demand by an integer.
         ///
         /// When multiplying any value by `.unlimited`, the result is `.unlimited`. If
         /// the multiplication operation overflows, the result is `.unlimited`.
-        public static func *(lhs: Demand, rhs: Int) -> Demand
+        public static func *(lhs: Demand, rhs: Int) -> Demand {
+            if lhs == .unlimited {
+                return .unlimited
+            }
+            let (value, overflow) = Int(lhs.rawValue).multipliedReportingOverflow(by: rhs)
+            return overflow ? .unlimited : Demand(rawValue: UInt(value))
+        }
 
         /// Multiplies a demand by an integer, and assigns the result to the demand.
         ///
         /// When multiplying any value by `.unlimited`, the result is `.unlimited`. If
         /// the multiplication operation overflows, the result is `.unlimited`.
         @inlinable
-        public static func *=(lhs: inout Demand, rhs: Int)
+        public static func *=(lhs: inout Demand, rhs: Int) {
+            lhs = lhs * rhs
+        }
 
         /// Returns the result of subtracting one demand from another.
         ///
-        /// When subtracting any value (including `.unlimited`) from `.unlimited`, the result is still `.unlimited`. Subtracting `.unlimited` from any value (except `.unlimited`) results in `.max(0)`. A negative demand is impossible; when an operation would result in a negative value, Combine adjusts the value to `.max(0)`.
+        /// When subtracting any value (including `.unlimited`) from `.unlimited`, the result is still `.unlimited`.
+        /// Subtracting `.unlimited` from any value (except `.unlimited`) results in `.max(0)`.
+        /// A negative demand is impossible; when an operation would result in a negative value,
+        /// ReactiveStream adjusts the value to `.max(0)`.
         @inlinable
-        public static func -(lhs: Demand, rhs: Demand) -> Demand
+        public static func -(lhs: Demand, rhs: Demand) -> Demand {
+            if lhs == .unlimited || rhs == .unlimited {
+                return .unlimited
+            }
+            let (value, overflow) = Int(lhs.rawValue).subtractingReportingOverflow(Int(rhs.rawValue))
+            return overflow ? .none : Demand(rawValue: UInt(value))
+        }
 
         /// Subtracts one demand from another, and assigns the result to the first demand.
         ///
-        /// When subtracting any value (including `.unlimited`) from `.unlimited`, the result is still `.unlimited`. Subtracting `.unlimited` from any value (except `.unlimited`) results in `.max(0)`. A negative demand is impossible; when an operation would result in a negative value, Combine adjusts the value to `.max(0)`.
+        /// When subtracting any value (including `.unlimited`) from `.unlimited`, the result is still `.unlimited`.
+        /// Subtracting `.unlimited` from any value (except `.unlimited`) results in `.max(0)`.
+        /// A negative demand is impossible; when an operation would result in a negative value,
+        /// ReactiveStream adjusts the value to `.max(0)`.
         @inlinable
-        public static func -=(lhs: inout Demand, rhs: Demand)
+        public static func -=(lhs: inout Demand, rhs: Demand) {
+            lhs = lhs - rhs
+        }
 
         /// Returns the result of subtracting an integer from a demand.
         ///
-        /// When subtracting any value from `.unlimited`, the result is still `.unlimited`. A negative demand is possible, but be aware that it isn't usable when requesting values in a subscription.
+        /// When subtracting any value from `.unlimited`, the result is still `.unlimited`.
+        /// A negative demand is possible, but be aware that it isn't usable when requesting values in a subscription.
         @inlinable
-        public static func -(lhs: Demand, rhs: Int) -> Demand
+        public static func -(lhs: Demand, rhs: Int) -> Demand {
+            if lhs == .unlimited || rhs == .unlimited {
+                return .unlimited
+            }
+            let (value, overflow) = Int(lhs.rawValue).subtractingReportingOverflow(rhs)
+            return overflow ? .none : Demand(rawValue: UInt(value))
+        }
 
         /// Subtracts an integer from a demand, and assigns the result to the demand.
         ///
-        /// When subtracting any value from `.unlimited`, the result is still `.unlimited`. A negative demand is impossible; when an operation would result in a negative value, Combine adjusts the value to `.max(0)`.
+        /// When subtracting any value from `.unlimited`, the result is still `.unlimited`.
+        /// A negative demand is impossible; when an operation would result in a negative value,
+        /// ReactiveStream adjusts the value to `.max(0)`.
         @inlinable
-        public static func -=(lhs: inout Demand, rhs: Int)
+        public static func -=(lhs: inout Demand, rhs: Int) {
+            lhs = lhs == .unlimited ? lhs : lhs - rhs
+        }
 
         /// Returns a Boolean that indicates whether the demand requests more than the given number of elements.
         ///
-        /// If `lhs` is `.unlimited`, then the result is always `true`. Otherwise, the operator compares the demand’s `max` value to `rhs`.
+        /// If `lhs` is `.unlimited`, then the result is always `true`. Otherwise,
+        /// the operator compares the demand's `max` value to `rhs`.
         @inlinable
-        public static func >(lhs: Demand, rhs: Int) -> Bool
+        public static func >(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? true : Int(lhs.rawValue) > rhs
+        }
 
-        /// Returns a Boolean that indicates whether the first demand requests more or the same number of elements as the second.
+        /// Returns a Boolean that indicates whether the first demand requests more or
+        /// the same number of elements as the second.
         ///
-        /// If `lhs` is `.unlimited`, then the result is always `true`. Otherwise, the operator compares the demand’s `max` value to `rhs`.
+        /// If `lhs` is `.unlimited`, then the result is always `true`.
+        /// Otherwise, the operator compares the demand's `max` value to `rhs`.
         @inlinable
-        public static func >=(lhs: Demand, rhs: Int) -> Bool
+        public static func >=(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? true : Int(lhs.rawValue) >= rhs
+        }
 
-        /// Returns a Boolean that indicates a given number of elements is greater than the maximum specified by the demand.
+        /// Returns a Boolean that indicates a given number of elements is greater than
+        /// the maximum specified by the demand.
         ///
-        /// If `rhs` is `.unlimited`, then the result is always `false`. Otherwise, the operator compares the demand’s `max` value to `lhs`.
+        /// If `rhs` is `.unlimited`, then the result is always `false`.
+        /// Otherwise, the operator compares the demand's `max` value to `lhs`.
         @inlinable
-        public static func >(lhs: Int, rhs: Demand) -> Bool
+        public static func >(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? false : lhs > Int(rhs.rawValue)
+        }
 
-        /// Returns a Boolean that indicates a given number of elements is greater than or equal to the maximum specified by the demand.
+        /// Returns a Boolean that indicates a given number of elements is greater than or
+        /// equal to the maximum specified by the demand.
         ///
-        /// If `rhs` is `.unlimited`, then the result is always `false`. Otherwise, the operator compares the demand’s `max` value to `lhs`.
+        /// If `rhs` is `.unlimited`, then the result is always `false`.
+        /// Otherwise, the operator compares the demand's `max` value to `lhs`.
         @inlinable
-        public static func >=(lhs: Int, rhs: Demand) -> Bool
+        public static func >=(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? false : lhs >= Int(rhs.rawValue)
+        }
 
         /// Returns a Boolean that indicates whether the demand requests fewer than the given number of elements.
         ///
-        /// If `lhs` is `.unlimited`, then the result is always `false`. Otherwise, the operator compares the demand’s `max` value to `rhs`.
+        /// If `lhs` is `.unlimited`, then the result is always `false`.
+        /// Otherwise, the operator compares the demand's `max` value to `rhs`.
         @inlinable
-        public static func <(lhs: Demand, rhs: Int) -> Bool
+        public static func <(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? false : Int(lhs.rawValue) < rhs
+        }
 
-        /// Returns a Boolean that indicates a given number of elements is less than the maximum specified by the demand.
+        /// Returns a Boolean that indicates a given number of elements is less than
+        /// the maximum specified by the demand.
         ///
-        /// If `rhs` is `.unlimited`, then the result is always `true`. Otherwise, the operator compares the demand’s `max` value to `lhs`.
+        /// If `rhs` is `.unlimited`, then the result is always `true`.
+        /// Otherwise, the operator compares the demand's `max` value to `lhs`.
         @inlinable
-        public static func <(lhs: Int, rhs: Demand) -> Bool
+        public static func <(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? true : lhs < Int(rhs.rawValue)
+        }
 
-        /// Returns a Boolean that indicates whether the demand requests fewer or the same number of elements as the given integer.
+        /// Returns a Boolean that indicates whether the demand requests fewer or
+        /// the same number of elements as the given integer.
         ///
-        /// If `lhs` is `.unlimited`, then the result is always `false`. Otherwise, the operator compares the demand’s `max` value to `rhs`.
+        /// If `lhs` is `.unlimited`, then the result is always `false`.
+        /// Otherwise, the operator compares the demand's `max` value to `rhs`.
         @inlinable
-        public static func <=(lhs: Demand, rhs: Int) -> Bool
+        public static func <=(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? false : Int(lhs.rawValue) <= rhs
+        }
 
-        /// Returns a Boolean value that indicates a given number of elements is less than or equal the maximum specified by the demand.
+        /// Returns a Boolean value that indicates a given number of elements is less than
+        /// or equal the maximum specified by the demand.
         ///
-        /// If `rhs` is `.unlimited`, then the result is always `true`. Otherwise, the operator compares the demand’s `max` value to `lhs`.
+        /// If `rhs` is `.unlimited`, then the result is always `true`.
+        /// Otherwise, the operator compares the demand's `max` value to `lhs`.
         @inlinable
-        public static func <=(lhs: Int, rhs: Demand) -> Bool
+        public static func <=(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? true : lhs <= Int(rhs.rawValue)
+        }
 
         /// Returns a Boolean that indicates whether the first demand requests fewer elements than the second.
         ///
-        /// If both sides are `.unlimited`, the result is always `false`. If `lhs` is `.unlimited`, then the result is always `false`. If `rhs` is `.unlimited` then the result is always `true`. Otherwise, this operator compares the demands’ `max` values.
+        /// If both sides are `.unlimited`, the result is always `false`.
+        /// If `lhs` is `.unlimited`, then the result is always `false`.
+        /// If `rhs` is `.unlimited` then the result is always `true`.
+        /// Otherwise, this operator compares the demands' `max` values.
         @inlinable
-        public static func <(lhs: Demand, rhs: Demand) -> Bool
+        public static func <(lhs: Demand, rhs: Demand) -> Bool {
+            if lhs == .unlimited {
+                return false
+            } else if rhs == .unlimited {
+                return true
+            }
+            return lhs.rawValue < rhs.rawValue
+        }
 
-        /// Returns a Boolean value that indicates whether the first demand requests fewer or the same number of elements as the second.
+        /// Returns a Boolean value that indicates whether the first demand requests fewer or
+        /// the same number of elements as the second.
         ///
-        /// If both sides are `.unlimited`, the result is always `true`. If `lhs` is `.unlimited`, then the result is always `false`. If `rhs` is unlimited then the result is always `true`. Otherwise, this operator compares the demands’ `max` values.
+        /// If both sides are `.unlimited`, the result is always `true`.
+        /// If `lhs` is `.unlimited`, then the result is always `false`.
+        /// If `rhs` is unlimited then the result is always `true`.
+        /// Otherwise, this operator compares the demands' `max` values.
         @inlinable
-        public static func <=(lhs: Demand, rhs: Demand) -> Bool
+        public static func <=(lhs: Demand, rhs: Demand) -> Bool {
+            if lhs == .unlimited {
+                return false
+            } else if rhs == .unlimited {
+                return true
+            }
+            return lhs.rawValue <= rhs.rawValue
+        }
 
-        /// Returns a Boolean that indicates whether the first demand requests more or the same number of elements as the second.
+        /// Returns a Boolean that indicates whether the first demand requests more or
+        /// the same number of elements as the second.
         ///
-        /// If both sides are `.unlimited`, the result is always `true`. If `lhs` is `.unlimited`, then the result is always `true`. If `rhs` is `.unlimited` then the result is always `false`. Otherwise, this operator compares the demands’ `max` values.
+        /// If both sides are `.unlimited`, the result is always `true`.
+        /// If `lhs` is `.unlimited`, then the result is always `true`.
+        /// If `rhs` is `.unlimited` then the result is always `false`.
+        /// Otherwise, this operator compares the demands' `max` values.
         @inlinable
-        public static func >=(lhs: Demand, rhs: Demand) -> Bool
+        public static func >=(lhs: Demand, rhs: Demand) -> Bool {
+            if lhs == .unlimited {
+                return true
+            } else if rhs == .unlimited {
+                return false
+            }
+            return lhs.rawValue >= rhs.rawValue
+        }
 
         /// Returns a Boolean that indicates whether the first demand requests more elements than the second.
         ///
-        /// If both sides are `.unlimited`, the result is always `false`. If `lhs` is `.unlimited`, then the result is always `true`. If `rhs` is `.unlimited` then the result is always `false`. Otherwise, this operator compares the demands’ `max` values.
+        /// If both sides are `.unlimited`, the result is always `false`.
+        /// If `lhs` is `.unlimited`, then the result is always `true`.
+        /// If `rhs` is `.unlimited` then the result is always `false`.
+        /// Otherwise, this operator compares the demands' `max` values.
         @inlinable
-        public static func >(lhs: Demand, rhs: Demand) -> Bool
+        public static func >(lhs: Demand, rhs: Demand) -> Bool {
+            if lhs == .unlimited {
+                return true
+            } else if rhs == .unlimited {
+                return false
+            }
+            return lhs.rawValue > rhs.rawValue
+        }
 
         /// Returns a Boolean value that indicates whether a demand requests the given number of elements.
         ///
-        /// An `.unlimited` demand doesn’t match any integer.
+        /// An `.unlimited` demand doesn't match any integer.
         @inlinable
-        public static func ==(lhs: Demand, rhs: Int) -> Bool
+        public static func ==(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? false : Int(lhs.rawValue) == rhs
+        }
 
         /// Returns a Boolean value that indicates whether a demand isn't equal to an integer.
         ///
-        /// The `.unlimited` value isn’t equal to any integer.
+        /// The `.unlimited` value isn't equal to any integer.
         @inlinable
-        public static func !=(lhs: Demand, rhs: Int) -> Bool
+        public static func !=(lhs: Demand, rhs: Int) -> Bool {
+            lhs == .unlimited ? true : Int(lhs.rawValue) != rhs
+        }
 
-        /// Returns a Boolean value that indicates whether a given number of elements matches the request of a given demand.
+        /// Returns a Boolean value that indicates whether a given number of
+        /// elements matches the request of a given demand.
         ///
-        /// An `.unlimited` demand doesn’t match any integer.
+        /// An `.unlimited` demand doesn't match any integer.
         @inlinable
-        public static func ==(lhs: Int, rhs: Demand) -> Bool
+        public static func ==(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? false : lhs == Int(rhs.rawValue)
+        }
 
         /// Returns a Boolean value that indicates whether an integer is unequal to a demand.
         ///
-        /// The `.unlimited` value isn’t equal to any integer.
+        /// The `.unlimited` value isn't equal to any integer.
         @inlinable
-        public static func !=(lhs: Int, rhs: Demand) -> Bool
+        public static func !=(lhs: Int, rhs: Demand) -> Bool {
+            rhs == .unlimited ? true : lhs != Int(rhs.rawValue)
+        }
 
         @inlinable
-        public static func == (lhs: Demand, rhs: Demand) -> Bool {
+        public static func ==(lhs: Demand, rhs: Demand) -> Bool {
             lhs.rawValue == rhs.rawValue
         }
 

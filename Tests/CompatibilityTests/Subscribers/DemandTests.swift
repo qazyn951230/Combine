@@ -20,16 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+import XCTest
+import Combine
+@testable import ReactiveStream
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
+typealias Demand1 = ReactiveStream.Subscribers.Demand
+typealias Demand2 = Combine.Subscribers.Demand
 
-        /// The publisher finished normally.
-        case finished
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+final class DemandTests: XCTestCase {
+    func testCreation() {
+        XCTAssertCrashes {
+            _ = Demand1.max(-1)
+        }
+        XCTAssertCrashes {
+            _ = Demand2.max(-1)
+        }
+    }
 
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
+    func testDescription() {
+        XCTAssertEqual(Demand1.none.description, Demand2.none.description)
+        XCTAssertEqual(Demand1.unlimited.description, Demand2.unlimited.description)
+        XCTAssertEqual(Demand1.max(123).description, Demand2.max(123).description)
+        XCTAssertEqual(Demand1.max(.max).description, Demand2.max(.max).description)
     }
 }

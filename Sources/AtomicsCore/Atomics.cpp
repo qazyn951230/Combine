@@ -20,16 +20,4 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
-
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
-
-        /// The publisher finished normally.
-        case finished
-
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
-    }
-}
+#import "Atomics.h"

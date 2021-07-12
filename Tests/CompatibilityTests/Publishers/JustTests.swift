@@ -20,16 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+import XCTest
+import Combine
+@testable import ReactiveStream
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
+typealias Just1 = ReactiveStream.Just
+typealias Just2 = Combine.Just
 
-        /// The publisher finished normally.
-        case finished
-
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
+@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+final class JustTests: XCTestCase {
+    func testJustSubscription() throws {
+//        let recorder1 = Just1(12).receiveRecorder()
+        let recorder2 = Just2(12).receiveRecorder(autoConnect: false)
+//        let subscription1 = try XCTUnwrap(recorder1.subscription)
+        let subscription2 = try XCTUnwrap(recorder2.subscription)
+//        XCTAssertTrue(subscription1 is CustomStringConvertible)
+//        XCTAssertTrue(subscription2 is CustomStringConvertible)
+        subscription2.cancel()
+        subscription2.request(.unlimited)
+        print(recorder2.recorders)
     }
 }

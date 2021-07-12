@@ -20,16 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-extension Subscribers {
+import XCTest
+@testable import Atomics
 
-    /// A signal that a publisher doesn't produce additional elements, either due to normal completion or an error.
-    @frozen
-    public enum Completion<Failure> where Failure : Error {
+class TestObject {
+    let value: Int
 
-        /// The publisher finished normally.
-        case finished
+    init(value: Int) {
+        self.value = value
+    }
+}
 
-        /// The publisher stopped publishing due to the indicated error.
-        case failure(Failure)
+final class AtomicValueTests: XCTestCase {
+    func testFoobar() {
+        let x = TestObject(value: 0)
+        let value = AtomicValue.make(x)
+        let d = value.load()
+        XCTAssertEqual(d.value, 0)
     }
 }
