@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef JIU_FOUNDATION_CONFIG_H
-#define JIU_FOUNDATION_CONFIG_H
+#ifndef REACTIVE_STREAM_ATOMIC_CONFIG_H
+#define REACTIVE_STREAM_ATOMIC_CONFIG_H
 
 // ------------- FILE ------------------
 
@@ -193,23 +193,6 @@ inline SOURCE wrap(const TARGET& value) {                       \
     return static_cast<SOURCE>(value);                          \
 }                                                               \
 
-#define SA_CLASS_CONVERSION(TARGET, SOURCE)                                                     \
-inline const TARGET& unwrap(const SOURCE& value) {                                              \
-    return *const_cast<const TARGET*>(reinterpret_cast<TARGET*>(const_cast<SOURCE*>(&value)));  \
-}                                                                                               \
-                                                                                                \
-inline TARGET& unwrap(SOURCE& value) {                                                          \
-    return *reinterpret_cast<TARGET*>(&value);                                                  \
-}                                                                                               \
-                                                                                                \
-inline const SOURCE& wrap(const TARGET& value) {                                                \
-    return *const_cast<const SOURCE*>(reinterpret_cast<SOURCE*>(const_cast<TARGET*>(&value)));  \
-}                                                                                               \
-                                                                                                \
-inline SOURCE& wrap(TARGET& value) {                                                            \
-    return *reinterpret_cast<SOURCE*>(&value);                                                  \
-}                                                                                               \
-
 #define SA_POINTER_CAST(type, source) (reinterpret_cast<type>(source))
 
 #else // (__cplusplus)
@@ -238,4 +221,4 @@ inline SOURCE wrap(const TARGET& value) {                       \
 
 // ------------- CAST ------------------
 
-#endif // JIU_FOUNDATION_CONFIG_H
+#endif // REACTIVE_STREAM_ATOMIC_CONFIG_H

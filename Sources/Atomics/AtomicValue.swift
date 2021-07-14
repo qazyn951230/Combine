@@ -43,21 +43,23 @@ public final class AtomicValue<T> where T: AnyObject {
 
     deinit {
         Manager(unsafeBufferObject: self).withUnsafeMutablePointers { header, elements in
-            let ref = unsafeBitCast(elements, to: AtomicRef.self)
-            Unmanaged<T>.fromOpaque(sa_ref_load_explicit(ref, .relaxed))
-                .release()
+//            let ref = unsafeBitCast(elements, to: AtomicRef.self)
+//            Unmanaged<T>.fromOpaque(sa_ref_load_explicit(ref, .relaxed))
+//                .release()
             header.deinitialize(count: 1)
             elements.deinitialize(count: sa_ref_required_size())
         }
     }
 
     @inlinable
-    public func store(_ value: __owned T) {
-        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer -> Void in
+    @discardableResult
+    public func store(_ value: __owned T) -> T {
+        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer -> T in
             let ref = unsafeBitCast(pointer, to: AtomicRef.self)
-            Unmanaged<T>.fromOpaque(sa_ref_load_explicit(ref, .relaxed))
-                .release()
-            return sa_ref_store_explicit(ref, Unmanaged.passRetained(value).toOpaque(), .relaxed)
+            let old = Unmanaged<T>.fromOpaque(sa_ref_load_explicit(ref, .relaxed))
+                .takeRetainedValue()
+            sa_ref_store_explicit(ref, Unmanaged.passRetained(value).toOpaque(), .relaxed)
+            return old
         }
     }
 
@@ -65,13 +67,44 @@ public final class AtomicValue<T> where T: AnyObject {
     public func load() -> T {
         Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer in
             let ref = unsafeBitCast(pointer, to: AtomicRef.self)
-//            let a = sa_ref_load_explicit(ref, .relaxed)
-//            let b = a.assumingMemoryBound(to: T.self)
-//            let c = b.pointee
-//            return c
-            return sa_ref_load_explicit(ref, .relaxed)
-                .assumingMemoryBound(to: T.self)
-                .pointee
+            return Unmanaged<T>.fromOpaque(sa_ref_load_explicit(ref, .relaxed))
+                .takeRetainedValue()
+        }
+    }
+
+    @inlinable
+    public func exchange(desired: T) -> T {
+        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer -> T in
+            let ref = unsafeBitCast(pointer, to: AtomicRef.self)
+            let new = Unmanaged<T>.passRetained(desired)
+                .toOpaque()
+            let old = sa_ref_exchange_explicit(ref, new, .relaxed)
+            return Unmanaged<T>.fromOpaque(old)
+                .takeRetainedValue()
+        }
+    }
+
+    @inlinable
+    public func compare(expected: T, desired: T) -> Bool {
+        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer in
+            let ref = unsafeBitCast(pointer, to: AtomicRef.self)
+            let _expected = Unmanaged<T>.passRetained(expected)
+                .toOpaque()
+            let _desired = Unmanaged<T>.passRetained(desired)
+                .toOpaque()
+            return sa_ref_compare_strong_explicit(ref, _expected, _desired, .relaxed, .relaxed)
+        }
+    }
+
+    @inlinable
+    public func weakCompare(expected: T, desired: T) -> Bool {
+        Manager(unsafeBufferObject: self).withUnsafeMutablePointerToElements { pointer in
+            let ref = unsafeBitCast(pointer, to: AtomicRef.self)
+            let _expected = Unmanaged<T>.passRetained(expected)
+                .toOpaque()
+            let _desired = Unmanaged<T>.passRetained(desired)
+                .toOpaque()
+            return sa_ref_compare_weak_explicit(ref, _expected, _desired, .relaxed, .relaxed)
         }
     }
 }

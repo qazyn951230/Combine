@@ -21,7 +21,10 @@ let package = Package(
     targets: [
         .target(
             name: "Demo",
-            dependencies: []),
+            dependencies: [
+                "Atomics",
+                "ReactiveStream"
+            ]),
         .target(
             name: "AtomicsCore",
             dependencies: []),

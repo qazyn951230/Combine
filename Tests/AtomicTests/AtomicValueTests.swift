@@ -22,6 +22,7 @@
 
 import XCTest
 @testable import Atomics
+@testable import AtomicsCore
 
 class TestObject {
     let value: Int
@@ -33,6 +34,12 @@ class TestObject {
 
 final class AtomicValueTests: XCTestCase {
     func testFoobar() {
+        let value = AtomicValue.make(TestObject(value: 0))
+        let d = value.load()
+        XCTAssertEqual(d.value, 0)
+    }
+
+    func testFoobar2() {
         let x = TestObject(value: 0)
         let value = AtomicValue.make(x)
         let d = value.load()

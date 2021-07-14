@@ -20,13 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import Combine
+import Darwin.C
+import ReactiveStream
+import Atomics
 
-@available(macOS 10.15, *)
-func main() {
-    print(Just(1))
+class TestObject {
+    let value: Int
+
+    init(value: Int) {
+        self.value = value
+    }
 }
 
-if #available(macOS 10.15, *) {
-    main()
+while true {
+    let value = AtomicValue.make(TestObject(value: 0))
+    let d = value.load()
+    print(d.value)
+    sleep(1)
 }
